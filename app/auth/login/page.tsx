@@ -30,9 +30,11 @@ async function loginAction(_prev: State, formData: FormData): Promise<State> {
 }
 
 const inputClass = (hasError: boolean) =>
-  `block w-full rounded-lg border px-3 py-2.5 text-sm text-gray-900 shadow-sm
-   placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-   ${hasError ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white'}`
+  `block w-full rounded-xl border px-4 py-3 text-sm text-neutral-900 transition-all bg-neutral-50
+   placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:bg-white
+   ${hasError
+     ? 'border-red-300 bg-red-50/50 focus:ring-red-400/5 focus:border-red-400'
+     : 'border-neutral-200 hover:border-neutral-300 focus:border-neutral-900 focus:ring-neutral-900/5'}`
 
 export default function LoginPage() {
   const router = useRouter()
@@ -55,35 +57,36 @@ export default function LoginPage() {
   return (
     <AuthCard title="Sign in to your account" subtitle="Don't have an account? Create one for free.">
       <form action={action} className="space-y-5">
-        <div className="space-y-1">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>
+        <div className="space-y-1.5">
+          <label htmlFor="email" className="block text-sm font-medium text-neutral-700">Email address</label>
           <input id="email" name="email" type="email" autoComplete="email" required
             placeholder="you@example.com" value={fields.email} onChange={set('email')}
             className={inputClass(!!state?.errors?.email)} />
-          {state?.errors?.email && <p className="text-xs text-red-600">{state.errors.email[0]}</p>}
+          {state?.errors?.email && <p className="mt-1 text-xs text-red-500">{state.errors.email[0]}</p>}
         </div>
 
-        <div className="space-y-1">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="block text-sm font-medium text-neutral-700">Password</label>
           <div className="relative">
             <input id="password" name="password" type={showPass ? 'text' : 'password'}
               autoComplete="current-password" required placeholder="••••••••"
               value={fields.password} onChange={set('password')}
               className={`${inputClass(!!state?.errors?.password)} pr-10`} />
             <button type="button" onClick={() => setShowPass((v) => !v)}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
-              <span className="text-xs">{showPass ? 'Hide' : 'Show'}</span>
+              className="absolute inset-y-0 right-3 flex items-center text-xs font-medium text-neutral-400 hover:text-neutral-700 transition-colors">
+              {showPass ? 'Hide' : 'Show'}
             </button>
           </div>
-          {state?.errors?.password && <p className="text-xs text-red-600">{state.errors.password[0]}</p>}
+          {state?.errors?.password && <p className="mt-1 text-xs text-red-500">{state.errors.password[0]}</p>}
         </div>
 
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-            <input type="checkbox" name="rememberMe" className="rounded border-gray-300 text-indigo-600" />
+          <label htmlFor="rememberMe" className="flex items-center gap-2 text-sm text-neutral-600 cursor-pointer select-none">
+            <input id="rememberMe" type="checkbox" name="rememberMe"
+              className="h-4 w-4 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900/10 cursor-pointer" />
             Remember me for 30 days
           </label>
-          <Link href="/auth/forgot-password" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+          <Link href="/auth/forgot-password" className="text-sm font-medium text-neutral-700 hover:text-neutral-900 transition-colors">
             Forgot password?
           </Link>
         </div>
@@ -92,9 +95,9 @@ export default function LoginPage() {
 
         <OAuthButtons />
 
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-neutral-500">
           Don&apos;t have an account?{' '}
-          <Link href="/auth/register" className="font-medium text-indigo-600 hover:text-indigo-500">Create one</Link>
+          <Link href="/auth/register" className="font-semibold text-neutral-900 hover:underline">Create one</Link>
         </p>
       </form>
     </AuthCard>

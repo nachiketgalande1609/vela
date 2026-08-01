@@ -5,7 +5,6 @@ import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { AuthCard } from '@/app/components/layout/AuthCard'
 import { Button } from '@/app/components/ui/Button'
-import { OAuthButtons } from '@/app/components/auth/OAuthButtons'
 import { getCsrfCookie } from '@/app/components/providers/CsrfProvider'
 
 type State = { errors?: Record<string, string[]>; error?: string; message?: string } | null
@@ -30,9 +29,11 @@ async function registerAction(_prev: State, formData: FormData): Promise<State> 
 }
 
 const inputClass = (hasError: boolean) =>
-  `block w-full rounded-lg border px-3 py-2.5 text-sm text-gray-900 shadow-sm
-   placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-   ${hasError ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white'}`
+  `block w-full rounded-xl border px-4 py-3 text-sm text-neutral-900 transition-all bg-neutral-50
+   placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:bg-white
+   ${hasError
+     ? 'border-red-300 bg-red-50/50 focus:ring-red-400/5 focus:border-red-400'
+     : 'border-neutral-200 hover:border-neutral-300 focus:border-neutral-900 focus:ring-neutral-900/5'}`
 
 export default function RegisterPage() {
   const [state, action, pending] = useActionState(registerAction, null)
@@ -56,13 +57,13 @@ export default function RegisterPage() {
     return (
       <AuthCard title="Check your email">
         <div className="text-center space-y-4">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100">
+            <svg className="h-8 w-8 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <p className="text-gray-600 text-sm">{state?.message}</p>
-          <Link href="/auth/login" className="inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500">
+          <p className="text-sm text-neutral-500">{state?.message}</p>
+          <Link href="/auth/login" className="inline-block text-sm font-semibold text-neutral-900 hover:underline">
             Back to login
           </Link>
         </div>
@@ -71,59 +72,56 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthCard title="Create your account" subtitle="Start your journey today.">
-      <form action={action} className="space-y-4">
-        <div className="space-y-1">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full name</label>
+    <AuthCard title="Create your account" subtitle="Already have an account?">
+      <form action={action} className="space-y-5">
+        <div className="space-y-1.5">
+          <label htmlFor="name" className="block text-sm font-medium text-neutral-700">Full name</label>
           <input id="name" name="name" type="text" autoComplete="name" required
             placeholder="Jane Smith" value={fields.name} onChange={set('name')}
             className={inputClass(!!state?.errors?.name)} />
-          {state?.errors?.name && <p className="text-xs text-red-600">{state.errors.name[0]}</p>}
+          {state?.errors?.name && <p className="mt-1 text-xs text-red-500">{state.errors.name[0]}</p>}
         </div>
 
-        <div className="space-y-1">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>
+        <div className="space-y-1.5">
+          <label htmlFor="email" className="block text-sm font-medium text-neutral-700">Email address</label>
           <input id="email" name="email" type="email" autoComplete="email" required
             placeholder="you@example.com" value={fields.email} onChange={set('email')}
             className={inputClass(!!state?.errors?.email)} />
-          {state?.errors?.email && <p className="text-xs text-red-600">{state.errors.email[0]}</p>}
+          {state?.errors?.email && <p className="mt-1 text-xs text-red-500">{state.errors.email[0]}</p>}
         </div>
 
-        <div className="space-y-1">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="block text-sm font-medium text-neutral-700">Password</label>
           <div className="relative">
             <input id="password" name="password" type={showPass ? 'text' : 'password'}
               autoComplete="new-password" required placeholder="Min. 8 characters"
               value={fields.password} onChange={set('password')}
               className={`${inputClass(!!state?.errors?.password)} pr-10`} />
             <button type="button" onClick={() => setShowPass((v) => !v)}
-              className="absolute inset-y-0 right-3 flex items-center text-xs text-gray-400 hover:text-gray-600">
+              className="absolute inset-y-0 right-3 flex items-center text-xs font-medium text-neutral-400 hover:text-neutral-700 transition-colors">
               {showPass ? 'Hide' : 'Show'}
             </button>
           </div>
           {state?.errors?.password && (
-            <ul className="text-xs text-red-600 space-y-0.5 list-disc list-inside">
+            <ul className="mt-1 text-xs text-red-500 space-y-0.5 list-disc list-inside">
               {state.errors.password.map((e) => <li key={e}>{e}</li>)}
             </ul>
           )}
         </div>
 
-        <div className="space-y-1">
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm password</label>
+        <div className="space-y-1.5">
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-neutral-700">Confirm password</label>
           <input id="confirmPassword" name="confirmPassword"
             type={showPass ? 'text' : 'password'} autoComplete="new-password" required
             placeholder="Repeat your password" value={fields.confirmPassword} onChange={set('confirmPassword')}
             className={inputClass(!!state?.errors?.confirmPassword)} />
-          {state?.errors?.confirmPassword && <p className="text-xs text-red-600">{state.errors.confirmPassword[0]}</p>}
+          {state?.errors?.confirmPassword && <p className="mt-1 text-xs text-red-500">{state.errors.confirmPassword[0]}</p>}
         </div>
 
         <Button type="submit" loading={pending} className="w-full">Create account</Button>
 
-        <OAuthButtons />
-
-        <p className="text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <Link href="/auth/login" className="font-medium text-indigo-600 hover:text-indigo-500">Sign in</Link>
+        <p className="text-center text-sm text-neutral-500">
+          <Link href="/auth/login" className="font-semibold text-neutral-900 hover:underline">Sign in instead</Link>
         </p>
       </form>
     </AuthCard>

@@ -43,15 +43,15 @@ export function Sidebar({ user }: { user: SidebarUser }) {
   }
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-20 flex w-60 flex-col bg-slate-900">
+    <aside className="fixed inset-y-0 left-0 z-20 flex w-60 flex-col bg-white border-r border-neutral-200">
       {/* Logo */}
-      <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-slate-800 px-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600">
+      <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-neutral-100 px-5">
+        <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-neutral-900">
           <svg className="h-3.5 w-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
           </svg>
         </div>
-        <span className="text-sm font-semibold text-white">{siteConfig.name}</span>
+        <span className="text-sm font-bold tracking-tight text-neutral-900">{siteConfig.name}</span>
       </div>
 
       {/* Nav */}
@@ -60,11 +60,11 @@ export function Sidebar({ user }: { user: SidebarUser }) {
           const active = pathname === href
           return (
             <Link key={href} href={href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150
                 ${active
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
-              <Icon className="h-4 w-4 shrink-0" />
+                  ? 'bg-neutral-100 text-neutral-900'
+                  : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800'}`}>
+              <Icon className={`h-4 w-4 shrink-0 ${active ? 'text-neutral-900' : 'text-neutral-400'}`} />
               {label}
             </Link>
           )
@@ -72,19 +72,19 @@ export function Sidebar({ user }: { user: SidebarUser }) {
       </nav>
 
       {/* User */}
-      <div className="shrink-0 border-t border-slate-800 p-3 space-y-1">
-        <div className="flex items-center gap-3 rounded-lg px-3 py-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">
+      <div className="shrink-0 border-t border-neutral-100 p-3">
+        <div className="flex items-center gap-3 rounded-xl px-3 py-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xs font-semibold text-white">
             {initials}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-white">{user.name ?? 'User'}</p>
-            <p className="truncate text-xs text-slate-500">{user.email}</p>
+            <p className="truncate text-sm font-semibold text-neutral-900">{user.name ?? 'User'}</p>
+            <p className="truncate text-xs text-neutral-400">{user.email}</p>
           </div>
         </div>
         <button onClick={handleLogout} disabled={loggingOut}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800 hover:text-white disabled:opacity-50">
-          <LogOut className="h-4 w-4 shrink-0" />
+          className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-neutral-500 transition-all hover:bg-neutral-50 hover:text-neutral-800 disabled:opacity-50">
+          <LogOut className="h-4 w-4 shrink-0 text-neutral-400" />
           {loggingOut ? 'Signing out…' : 'Sign out'}
         </button>
       </div>

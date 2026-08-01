@@ -29,6 +29,13 @@ function makeResetAction(token: string) {
   }
 }
 
+const inputClass = (hasError: boolean) =>
+  `block w-full rounded-xl border px-4 py-3 text-sm text-neutral-900 transition-all bg-neutral-50
+   placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:bg-white
+   ${hasError
+     ? 'border-red-300 bg-red-50/50 focus:ring-red-400/5 focus:border-red-400'
+     : 'border-neutral-200 hover:border-neutral-300 focus:border-neutral-900 focus:ring-neutral-900/5'}`
+
 function ResetPasswordForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -49,7 +56,7 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <div className="text-center space-y-4">
-        <p className="text-sm text-gray-600">This password reset link is invalid. Please request a new one.</p>
+        <p className="text-sm text-neutral-500">This password reset link is invalid. Please request a new one.</p>
         <Link href="/auth/forgot-password">
           <Button variant="secondary">Request new link</Button>
         </Link>
@@ -59,21 +66,19 @@ function ResetPasswordForm() {
 
   return (
     <form action={action} className="space-y-5">
-      <div className="space-y-1">
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">New password</label>
+      <div className="space-y-1.5">
+        <label htmlFor="password" className="block text-sm font-medium text-neutral-700">New password</label>
         <div className="relative">
           <input id="password" name="password" type={showPass ? 'text' : 'password'}
             autoComplete="new-password" required placeholder="Min. 8 characters"
-            className={`block w-full rounded-lg border px-3 py-2.5 pr-10 text-sm text-gray-900 shadow-sm
-              placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500
-              ${state?.errors?.password ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white'}`} />
+            className={`${inputClass(!!state?.errors?.password)} pr-10`} />
           <button type="button" onClick={() => setShowPass((v) => !v)}
-            className="absolute inset-y-0 right-3 flex items-center text-xs text-gray-400 hover:text-gray-600">
+            className="absolute inset-y-0 right-3 flex items-center text-xs font-medium text-neutral-400 hover:text-neutral-700 transition-colors">
             {showPass ? 'Hide' : 'Show'}
           </button>
         </div>
         {state?.errors?.password && (
-          <ul className="text-xs text-red-600 space-y-0.5 list-disc list-inside">
+          <ul className="mt-1 text-xs text-red-500 space-y-0.5 list-disc list-inside">
             {state.errors.password.map((e) => <li key={e}>{e}</li>)}
           </ul>
         )}
@@ -91,7 +96,7 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <AuthCard title="Set new password" subtitle="Choose a strong password for your account.">
-      <Suspense fallback={<div className="text-center text-sm text-gray-500">Loading…</div>}>
+      <Suspense fallback={<div className="text-center text-sm text-neutral-400">Loading…</div>}>
         <ResetPasswordForm />
       </Suspense>
     </AuthCard>

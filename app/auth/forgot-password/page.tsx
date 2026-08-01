@@ -34,14 +34,14 @@ export default function ForgotPasswordPage() {
     return (
       <AuthCard title="Check your inbox">
         <div className="text-center space-y-4">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100">
-            <svg className="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100">
+            <svg className="h-8 w-8 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
-          <p className="text-sm text-gray-600">{state?.message}</p>
-          <Link href="/auth/login" className="inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500">
+          <p className="text-sm text-neutral-500">{state?.message}</p>
+          <Link href="/auth/login" className="inline-block text-sm font-semibold text-neutral-900 hover:underline">
             Back to login
           </Link>
         </div>
@@ -56,9 +56,9 @@ export default function ForgotPasswordPage() {
           autoComplete="email" required placeholder="you@example.com"
           error={state?.errors?.email} />
         <Button type="submit" loading={pending} className="w-full">Send reset link</Button>
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-neutral-500">
           Remembered your password?{' '}
-          <Link href="/auth/login" className="font-medium text-indigo-600 hover:text-indigo-500">Sign in</Link>
+          <Link href="/auth/login" className="font-semibold text-neutral-900 hover:underline">Sign in</Link>
         </p>
       </form>
     </AuthCard>

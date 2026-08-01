@@ -10,7 +10,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   if (!user) redirect('/auth/login')
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-neutral-50">
       <Sidebar user={{ name: user.name, email: user.email, role: user.role }} />
       <div className="pl-60">
         {children}

@@ -9,19 +9,21 @@ export function FormField({ label, error, id, className = '', ...props }: FormFi
   const errorMsg = Array.isArray(error) ? error[0] : error
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="block text-sm font-medium text-slate-700">
+      <label htmlFor={id} className="block text-sm font-medium text-neutral-700">
         {label}
       </label>
       <input
         id={id}
         {...props}
-        className={`block w-full rounded-lg border px-3 py-2.5 text-sm text-slate-900 shadow-sm
-          placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-          disabled:bg-slate-50 disabled:text-slate-400
-          ${errorMsg ? 'border-red-400 bg-red-50 focus:ring-red-400' : 'border-slate-200 bg-white'}
+        className={`block w-full rounded-xl border px-4 py-3 text-sm text-neutral-900 transition-all bg-neutral-50
+          placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:bg-white
+          disabled:bg-neutral-100 disabled:text-neutral-400 disabled:cursor-not-allowed
+          ${errorMsg
+            ? 'border-red-300 bg-red-50/50 focus:ring-red-400/5 focus:border-red-400'
+            : 'border-neutral-200 hover:border-neutral-300 focus:border-neutral-900 focus:ring-neutral-900/5'}
           ${className}`}
       />
-      {errorMsg && <p className="text-xs text-red-600">{errorMsg}</p>}
+      {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
     </div>
   )
 }
