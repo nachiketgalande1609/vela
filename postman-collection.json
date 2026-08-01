@@ -1,0 +1,196 @@
+{
+  "info": {
+    "_postman_id": "auth-template-collection",
+    "name": "AuthTemplate API",
+    "description": "Complete authentication API for the Next.js 16 AuthTemplate project.\n\nBefore using: call GET /api/auth/csrf to get a CSRF token, then set the {{csrfToken}} variable.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "csrfToken", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "CSRF",
+      "item": [
+        {
+          "name": "Get CSRF Token",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/csrf",
+            "description": "Fetch a CSRF token. The token is also set as a cookie. Copy the csrfToken value and set it as the {{csrfToken}} collection variable."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('csrfToken', json.csrfToken);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Registration",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/register",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Smith\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"Secure@123!\",\n  \"confirmPassword\": \"Secure@123!\"\n}"
+            },
+            "description": "Create a new user account. An email verification link is sent to the provided email."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/login",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin@123!\",\n  \"rememberMe\": false\n}"
+            },
+            "description": "Login with email and password. Sets access_token and refresh_token httpOnly cookies on success."
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/me",
+            "description": "Returns the currently authenticated user's profile. Requires access_token cookie."
+          }
+        },
+        {
+          "name": "Refresh Tokens",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/refresh",
+            "description": "Rotate access and refresh tokens. Requires refresh_token cookie. Returns new tokens as httpOnly cookies."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/logout",
+            "header": [
+              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+            ],
+            "description": "Logout the current session (deletes the session from the DB and clears cookies)."
+          }
+        },
+        {
+          "name": "Logout All Devices",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/logout-all",
+            "header": [
+              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+            ],
+            "description": "Revoke ALL sessions for the current user across all devices."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Email Verification",
+      "item": [
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/verify-email",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"<verification-token-from-email>\"\n}"
+            },
+            "description": "Verify a user's email address using the token sent to their email."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Password Reset",
+      "item": [
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/forgot-password",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jane@example.com\"\n}"
+            },
+            "description": "Request a password reset email. Always returns 200 to prevent email enumeration."
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/reset-password",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-csrf-token", "value": "{{csrfToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"<reset-token-from-email>\",\n  \"password\": \"NewSecure@456!\",\n  \"confirmPassword\": \"NewSecure@456!\"\n}"
+            },
+            "description": "Reset a user's password using the token from the reset email. Invalidates all existing sessions."
+          }
+        }
+      ]
+    },
+    {
+      "name": "OAuth",
+      "item": [
+        {
+          "name": "Start Google OAuth",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/oauth/google",
+            "description": "Initiates Google OAuth flow. Open this URL in a browser — it will redirect to Google's login page."
+          }
+        },
+        {
+          "name": "Start GitHub OAuth",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/oauth/github",
+            "description": "Initiates GitHub OAuth flow. Open this URL in a browser — it will redirect to GitHub's login page."
+          }
+        }
+      ]
+    }
+  ]
+}
