@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, User, ShieldCheck, LogOut } from 'lucide-react'
+import { LayoutDashboard, User, ShieldCheck, LogOut, Image } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { getCsrfCookie } from '@/app/components/providers/CsrfProvider'
@@ -17,7 +17,10 @@ const baseNav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/profile', label: 'Profile', icon: User },
 ]
-const adminNav = [{ href: '/admin', label: 'Admin', icon: ShieldCheck }]
+const adminNav = [
+  { href: '/admin', label: 'Admin', icon: ShieldCheck },
+  { href: '/admin/wallpapers', label: 'Wallpapers', icon: Image },
+]
 
 export function Sidebar({ user }: { user: SidebarUser }) {
   const pathname = usePathname()

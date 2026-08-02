@@ -39,68 +39,69 @@ export async function POST(req: NextRequest) {
 
   const { email, password, rememberMe } = parsed.data
 
-  const user = await getUserByEmail(email)
+  try {
+    const user = await getUserByEmail(email)
 
-  // Use constant-time compare to prevent user enumeration via timing
-  const dummyHash = '$2b$12$invaliddummyhashfortimingprotectionXXXXXXXXXXXXXXXXXX'
-  const passwordToCompare = user?.password ?? dummyHash
-  const passwordMatch = await bcrypt.compare(password, passwordToCompare)
+    // Use constant-time compare to prevent user enumeration via timing
+    const dummyHash = '$2b$12$invaliddummyhashfortimingprotectionXXXXXXXXXXXXXXXXXX'
+    const passwordToCompare = user?.password ?? dummyHash
+    const passwordMatch = await bcrypt.compare(password, passwordToCompare)
 
-  if (!user || !passwordMatch) {
-    if (user) {
-      await incrementFailedLoginAttempts(user.id)
-      const newAttempts = user.failedLoginAttempts + 1
-      if (newAttempts >= MAX_FAILED_ATTEMPTS) {
-        const until = new Date(Date.now() + BRUTE_FORCE_LOCK_MINUTES * 60 * 1000)
-        await lockUser(user.id, until)
-        return NextResponse.json({ error: 'Account locked due to too many failed attempts. Try again in 30 minutes.' }, { status: 423 })
+    if (!user || !passwordMatch) {
+      if (user) {
+        await incrementFailedLoginAttempts(user.id)
+        const newAttempts = user.failedLoginAttempts + 1
+        if (newAttempts >= MAX_FAILED_ATTEMPTS) {
+          const until = new Date(Date.now() + BRUTE_FORCE_LOCK_MINUTES * 60 * 1000)
+          await lockUser(user.id, until)
+          return NextResponse.json({ error: 'Account locked due to too many failed attempts. Try again in 30 minutes.' }, { status: 423 })
+        }
       }
+      return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 })
     }
-    return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 })
+
+    // Check account lock
+    if (user.lockedUntil && new Date() < user.lockedUntil) {
+      const minutesLeft = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000)
+      return NextResponse.json({ error: `Account is locked. Try again in ${minutesLeft} minutes.` }, { status: 423 })
+    }
+
+    // Check email verification
+    if (!user.emailVerified) {
+      return NextResponse.json({ error: 'Please verify your email before logging in.', code: 'EMAIL_NOT_VERIFIED' }, { status: 403 })
+    }
+
+    // Successful login — reset counters
+    await resetLoginAttempts(user.id)
+    resetRateLimit(`login:${ip}`)
+
+    const ttl = rememberMe ? REMEMBER_TTL_MS : REFRESH_TTL_MS
+    const expiresAt = new Date(Date.now() + ttl)
+
+    const session = await createSession(
+      user.id,
+      'placeholder',
+      expiresAt,
+      req.headers.get('user-agent') ?? undefined,
+      ip,
+    )
+
+    const [accessToken, refreshToken] = await Promise.all([
+      createAccessToken(user.id, user.role),
+      createRefreshToken(user.id, session.id),
+    ])
+
+    const { prisma } = await import('@/lib/db/prisma')
+    await prisma.session.update({ where: { id: session.id }, data: { refreshToken } })
+
+    await setAuthCookies(accessToken, refreshToken, rememberMe)
+    await generateCsrfToken()
+
+    return NextResponse.json({
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+    })
+  } catch (err) {
+    console.error('[login]', err)
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 })
   }
-
-  // Check account lock
-  if (user.lockedUntil && new Date() < user.lockedUntil) {
-    const minutesLeft = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000)
-    return NextResponse.json({ error: `Account is locked. Try again in ${minutesLeft} minutes.` }, { status: 423 })
-  }
-
-  // Check email verification
-  if (!user.emailVerified) {
-    return NextResponse.json({ error: 'Please verify your email before logging in.', code: 'EMAIL_NOT_VERIFIED' }, { status: 403 })
-  }
-
-  // Successful login — reset counters
-  await resetLoginAttempts(user.id)
-  resetRateLimit(`login:${ip}`)
-
-  const ttl = rememberMe ? REMEMBER_TTL_MS : REFRESH_TTL_MS
-  const expiresAt = new Date(Date.now() + ttl)
-
-  // Create refresh token (stored in DB for revocation)
-  const session = await createSession(
-    user.id,
-    'placeholder', // replaced below after we have the JWT
-    expiresAt,
-    req.headers.get('user-agent') ?? undefined,
-    ip,
-  )
-
-  const [accessToken, refreshToken] = await Promise.all([
-    createAccessToken(user.id, user.role),
-    createRefreshToken(user.id, session.id),
-  ])
-
-  // Update the session row with the real JWT
-  const { prisma } = await import('@/lib/db/prisma')
-  await prisma.session.update({ where: { id: session.id }, data: { refreshToken } })
-
-  await setAuthCookies(accessToken, refreshToken, rememberMe)
-
-  // Issue a fresh CSRF token with the new session
-  await generateCsrfToken()
-
-  return NextResponse.json({
-    user: { id: user.id, email: user.email, name: user.name, role: user.role },
-  })
 }

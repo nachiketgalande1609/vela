@@ -27,14 +27,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ errors: parsed.error.flatten().fieldErrors }, { status: 422 })
   }
 
-  // Always return 200 to prevent email enumeration
   const { email } = parsed.data
-  const user = await getUserByEmail(email)
 
-  if (user && user.emailVerified) {
-    const token = await createVerificationToken(user.id, 'PASSWORD_RESET')
-    await sendPasswordResetEmail(email, user.name ?? '', token).catch(console.error)
+  try {
+    const user = await getUserByEmail(email)
+    if (user && user.emailVerified) {
+      const token = await createVerificationToken(user.id, 'PASSWORD_RESET')
+      await sendPasswordResetEmail(email, user.name ?? '', token).catch(console.error)
+    }
+  } catch (err) {
+    console.error('[forgot-password]', err)
   }
 
+  // Always return 200 to prevent email enumeration
   return NextResponse.json({ message: 'If an account exists for that email, a reset link has been sent.' })
 }

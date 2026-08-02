@@ -16,7 +16,6 @@ function VerifyEmailContent() {
 
   useEffect(() => {
     if (!token) return
-
     const verify = async () => {
       try {
         const res = await fetch('/api/auth/verify-email', {
@@ -33,7 +32,6 @@ function VerifyEmailContent() {
         setStatus('error')
       }
     }
-
     verify()
   }, [token, router])
 
@@ -41,42 +39,47 @@ function VerifyEmailContent() {
     <div className="text-center space-y-6">
       {status === 'verifying' && (
         <>
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
-          <p className="text-gray-600 text-sm">Verifying your email address…</p>
+          <div className="flex justify-center">
+            <svg className="h-8 w-8 animate-spin text-[var(--accent)]" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          </div>
+          <p className="text-sm text-[var(--text-muted)]">Verifying your email address…</p>
         </>
       )}
 
       {status === 'success' && (
         <>
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[4px] border border-[var(--accent)]/30 bg-[var(--surface-2)]">
+            <svg className="h-7 w-7 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <p className="text-gray-700 text-sm font-medium">{message}</p>
-          <p className="text-gray-500 text-xs">Redirecting you to login…</p>
+          <p className="text-sm font-medium text-[var(--text)]">{message}</p>
+          <p className="text-xs text-[var(--text-muted)]">Redirecting to sign in…</p>
         </>
       )}
 
       {status === 'error' && (
         <>
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-            <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[4px] border border-red-500/30 bg-[var(--surface-2)]">
+            <svg className="h-7 w-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <p className="text-red-700 text-sm">{message}</p>
+          <p className="text-sm text-red-400">{message}</p>
           <Link href="/auth/login">
-            <Button variant="secondary">Back to login</Button>
+            <Button variant="gold">Back to sign in</Button>
           </Link>
         </>
       )}
 
       {status === 'idle' && (
         <>
-          <p className="text-gray-600 text-sm">No verification token found. Check your email for the verification link.</p>
+          <p className="text-sm text-[var(--text-muted)]">No verification token found. Check your email for the link.</p>
           <Link href="/auth/login">
-            <Button variant="secondary">Back to login</Button>
+            <Button variant="gold">Back to sign in</Button>
           </Link>
         </>
       )}
@@ -86,8 +89,15 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <AuthCard title="Email Verification">
-      <Suspense fallback={<div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />}>
+    <AuthCard title="Verify email">
+      <Suspense fallback={
+        <div className="flex justify-center py-8">
+          <svg className="h-5 w-5 animate-spin text-[var(--accent)]" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+        </div>
+      }>
         <VerifyEmailContent />
       </Suspense>
     </AuthCard>

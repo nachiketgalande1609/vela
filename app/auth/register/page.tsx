@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { AuthCard } from '@/app/components/layout/AuthCard'
 import { Button } from '@/app/components/ui/Button'
 import { getCsrfCookie } from '@/app/components/providers/CsrfProvider'
+import { authInputClass } from '@/app/components/auth/authInputClass'
 
 type State = { errors?: Record<string, string[]>; error?: string; message?: string } | null
 
@@ -16,24 +17,15 @@ async function registerAction(_prev: State, formData: FormData): Promise<State> 
     password: formData.get('password'),
     confirmPassword: formData.get('confirmPassword'),
   }
-
   const res = await fetch('/api/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-csrf-token': getCsrfCookie() },
     body: JSON.stringify(body),
   })
-
   const data = await res.json()
   if (!res.ok) return { errors: data.errors, error: data.error }
   return { message: data.message }
 }
-
-const inputClass = (hasError: boolean) =>
-  `block w-full rounded-xl border px-4 py-3 text-sm text-neutral-900 transition-all bg-neutral-50
-   placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:bg-white
-   ${hasError
-     ? 'border-red-300 bg-red-50/50 focus:ring-red-400/5 focus:border-red-400'
-     : 'border-neutral-200 hover:border-neutral-300 focus:border-neutral-900 focus:ring-neutral-900/5'}`
 
 export default function RegisterPage() {
   const [state, action, pending] = useActionState(registerAction, null)
@@ -56,15 +48,16 @@ export default function RegisterPage() {
   if (done) {
     return (
       <AuthCard title="Check your email">
-        <div className="text-center space-y-4">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100">
-            <svg className="h-8 w-8 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        <div className="text-center space-y-5">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[4px] border border-[var(--accent)]/30 bg-[var(--surface-2)]">
+            <svg className="h-7 w-7 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <p className="text-sm text-neutral-500">{state?.message}</p>
-          <Link href="/auth/login" className="inline-block text-sm font-semibold text-neutral-900 hover:underline">
-            Back to login
+          <p className="text-sm text-[var(--text-muted)]">{state?.message}</p>
+          <Link href="/auth/login"
+            className="inline-block text-sm font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors">
+            Back to sign in →
           </Link>
         </div>
       </AuthCard>
@@ -72,56 +65,69 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthCard title="Create your account" subtitle="Already have an account?">
+    <AuthCard title="Create account" subtitle="Join Vela and start your collection.">
       <form action={action} className="space-y-5">
         <div className="space-y-1.5">
-          <label htmlFor="name" className="block text-sm font-medium text-neutral-700">Full name</label>
+          <label htmlFor="name" className="block text-xs font-medium uppercase tracking-widest text-[var(--text-muted)]">
+            Full name
+          </label>
           <input id="name" name="name" type="text" autoComplete="name" required
             placeholder="Jane Smith" value={fields.name} onChange={set('name')}
-            className={inputClass(!!state?.errors?.name)} />
-          {state?.errors?.name && <p className="mt-1 text-xs text-red-500">{state.errors.name[0]}</p>}
+            className={authInputClass(!!state?.errors?.name)} />
+          {state?.errors?.name && <p className="mt-1 text-xs text-red-400">{state.errors.name[0]}</p>}
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="email" className="block text-sm font-medium text-neutral-700">Email address</label>
+          <label htmlFor="email" className="block text-xs font-medium uppercase tracking-widest text-[var(--text-muted)]">
+            Email
+          </label>
           <input id="email" name="email" type="email" autoComplete="email" required
             placeholder="you@example.com" value={fields.email} onChange={set('email')}
-            className={inputClass(!!state?.errors?.email)} />
-          {state?.errors?.email && <p className="mt-1 text-xs text-red-500">{state.errors.email[0]}</p>}
+            className={authInputClass(!!state?.errors?.email)} />
+          {state?.errors?.email && <p className="mt-1 text-xs text-red-400">{state.errors.email[0]}</p>}
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="password" className="block text-sm font-medium text-neutral-700">Password</label>
+          <label htmlFor="password" className="block text-xs font-medium uppercase tracking-widest text-[var(--text-muted)]">
+            Password
+          </label>
           <div className="relative">
             <input id="password" name="password" type={showPass ? 'text' : 'password'}
               autoComplete="new-password" required placeholder="Min. 8 characters"
               value={fields.password} onChange={set('password')}
-              className={`${inputClass(!!state?.errors?.password)} pr-10`} />
+              className={`${authInputClass(!!state?.errors?.password)} pr-12`} />
             <button type="button" onClick={() => setShowPass((v) => !v)}
-              className="absolute inset-y-0 right-3 flex items-center text-xs font-medium text-neutral-400 hover:text-neutral-700 transition-colors">
+              className="absolute inset-y-0 right-3 flex items-center text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">
               {showPass ? 'Hide' : 'Show'}
             </button>
           </div>
           {state?.errors?.password && (
-            <ul className="mt-1 text-xs text-red-500 space-y-0.5 list-disc list-inside">
+            <ul className="mt-1 text-xs text-red-400 space-y-0.5 list-disc list-inside">
               {state.errors.password.map((e) => <li key={e}>{e}</li>)}
             </ul>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-neutral-700">Confirm password</label>
+          <label htmlFor="confirmPassword" className="block text-xs font-medium uppercase tracking-widest text-[var(--text-muted)]">
+            Confirm password
+          </label>
           <input id="confirmPassword" name="confirmPassword"
             type={showPass ? 'text' : 'password'} autoComplete="new-password" required
             placeholder="Repeat your password" value={fields.confirmPassword} onChange={set('confirmPassword')}
-            className={inputClass(!!state?.errors?.confirmPassword)} />
-          {state?.errors?.confirmPassword && <p className="mt-1 text-xs text-red-500">{state.errors.confirmPassword[0]}</p>}
+            className={authInputClass(!!state?.errors?.confirmPassword)} />
+          {state?.errors?.confirmPassword && <p className="mt-1 text-xs text-red-400">{state.errors.confirmPassword[0]}</p>}
         </div>
 
-        <Button type="submit" loading={pending} className="w-full">Create account</Button>
+        <Button type="submit" variant="gold" loading={pending} className="w-full">
+          Create account
+        </Button>
 
-        <p className="text-center text-sm text-neutral-500">
-          <Link href="/auth/login" className="font-semibold text-neutral-900 hover:underline">Sign in instead</Link>
+        <p className="text-center text-sm text-[var(--text-muted)]">
+          Already have an account?{' '}
+          <Link href="/auth/login" className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors">
+            Sign in
+          </Link>
         </p>
       </form>
     </AuthCard>

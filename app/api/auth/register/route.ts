@@ -35,17 +35,23 @@ export async function POST(req: NextRequest) {
 
   const { name, email, password } = parsed.data
 
-  const existing = await getUserByEmail(email)
-  if (existing) {
-    // Constant-time response to avoid user enumeration
-    return NextResponse.json({ message: 'If that email is available, you will receive a verification link shortly.' })
+  try {
+    const existing = await getUserByEmail(email)
+    if (existing) {
+      return NextResponse.json({ message: 'If that email is available, you will receive a verification link shortly.' })
+    }
+
+    const hashed = await bcrypt.hash(password, 12)
+    const user = await createUser({ name, email, password: hashed })
+
+    const token = await createVerificationToken(user.id, 'EMAIL_VERIFICATION')
+    await sendVerificationEmail(email, name, token).catch((err) => {
+      console.error('[register] SMTP send failed:', err?.message ?? err)
+    })
+
+    return NextResponse.json({ message: 'Account created. Check your email to verify your account.' }, { status: 201 })
+  } catch (err) {
+    console.error('[register]', err)
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 })
   }
-
-  const hashed = await bcrypt.hash(password, 12)
-  const user = await createUser({ name, email, password: hashed })
-
-  const token = await createVerificationToken(user.id, 'EMAIL_VERIFICATION')
-  await sendVerificationEmail(email, name, token).catch(console.error)
-
-  return NextResponse.json({ message: 'Account created. Check your email to verify your account.' }, { status: 201 })
 }

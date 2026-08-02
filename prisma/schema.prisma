@@ -32,6 +32,8 @@ model User {
   sessions      Session[]
   oauthAccounts OAuthAccount[]
   tokens        VerificationToken[]
+  purchases     Purchase[]
+  subscription  Subscription?
 
   @@index([email])
 }
@@ -78,4 +80,69 @@ model OAuthAccount {
 
   @@unique([provider, providerAccountId])
   @@index([userId])
+}
+
+model Wallpaper {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  price       Float
+  category    String
+  tags        String
+  width       Int      @default(1080)
+  height      Int      @default(1920)
+  storagePath String
+  previewPath String
+  thumbPath   String
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  purchases Purchase[]
+
+  @@index([category])
+  @@index([published])
+}
+
+model Purchase {
+  id              String    @id @default(cuid())
+  userId          String
+  wallpaperId     String
+  stripePaymentId String    @unique
+  amount          Float
+  createdAt       DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id])
+  wallpaper Wallpaper @relation(fields: [wallpaperId], references: [id])
+
+  @@unique([userId, wallpaperId])
+  @@index([userId])
+}
+
+model Subscription {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  stripeSubId      String   @unique
+  stripeCustomerId String
+  status           String   // active | canceled | past_due | trialing
+  currentPeriodEnd DateTime
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model DownloadNonce {
+  id          String   @id @default(cuid())
+  nonce       String   @unique
+  userId      String
+  wallpaperId String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([nonce])
+  @@index([expiresAt])
 }

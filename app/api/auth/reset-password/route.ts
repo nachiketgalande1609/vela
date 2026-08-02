@@ -22,19 +22,25 @@ export async function POST(req: NextRequest) {
   }
 
   const { token, password } = parsed.data
-  const record = await getVerificationToken(token)
 
-  if (!record || record.type !== 'PASSWORD_RESET' || new Date() > record.expiresAt) {
-    return NextResponse.json({ error: 'Reset link is invalid or has expired.' }, { status: 400 })
+  try {
+    const record = await getVerificationToken(token)
+
+    if (!record || record.type !== 'PASSWORD_RESET' || new Date() > record.expiresAt) {
+      return NextResponse.json({ error: 'Reset link is invalid or has expired.' }, { status: 400 })
+    }
+
+    const hashed = await bcrypt.hash(password, 12)
+
+    await Promise.all([
+      updateUser(record.userId, { password: hashed }),
+      deleteVerificationToken(record.id),
+      deleteAllUserSessions(record.userId),
+    ])
+
+    return NextResponse.json({ message: 'Password reset successfully. Please log in with your new password.' })
+  } catch (err) {
+    console.error('[reset-password]', err)
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 })
   }
-
-  const hashed = await bcrypt.hash(password, 12)
-
-  await Promise.all([
-    updateUser(record.userId, { password: hashed }),
-    deleteVerificationToken(record.id),
-    deleteAllUserSessions(record.userId), // invalidate all sessions after password change
-  ])
-
-  return NextResponse.json({ message: 'Password reset successfully. Please log in with your new password.' })
 }
