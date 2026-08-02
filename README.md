@@ -2,6 +2,13 @@
 
 A production-ready, reusable authentication template built on **Next.js 16** (App Router) with full security hardening. Clone it, configure it, and ship.
 
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=flat-square&logo=prisma)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-Aiven-4479A1?style=flat-square&logo=mysql&logoColor=white)
+
 ---
 
 ## Features
@@ -29,6 +36,19 @@ A production-ready, reusable authentication template built on **Next.js 16** (Ap
 
 ---
 
+## UI
+
+Clean, professional design using a neutral palette — white cards, `neutral-900` accents, subtle shadows. Fully responsive within `100vh` on all screen sizes.
+
+- **Auth pages** — centered card layout, logo, contextual error messages, show/hide password
+- **Dashboard** — stats overview, recent activity, quick actions
+- **Profile** — avatar, account details, role badge
+- **Admin panel** — user table with role and verification status
+- **Sidebar** — light nav with active state highlight, avatar initials
+- **Landing page** — hero section, feature grid, top nav
+
+---
+
 ## Project Structure
 
 ```
@@ -39,6 +59,8 @@ A production-ready, reusable authentication template built on **Next.js 16** (Ap
 │   ├── admin/             # Admin-only page
 │   ├── profile/           # Protected profile page
 │   └── components/        # UI components and providers
+├── config/
+│   └── site.ts            # App name, stack label — single-file branding
 ├── lib/
 │   ├── auth/              # Session, CSRF, rate-limit, DAL, OAuth helpers
 │   ├── db/                # Prisma queries (users, sessions, tokens)
@@ -47,6 +69,8 @@ A production-ready, reusable authentication template built on **Next.js 16** (Ap
 │   ├── schema.prisma
 │   ├── seed.ts            # Creates default admin user
 │   └── migrations/
+├── scripts/
+│   └── create-db.mjs      # Creates the database (requires AIVEN_DB_PASSWORD env var)
 ├── proxy.ts               # Next.js 16 route-protection proxy (replaces middleware.ts)
 └── next.config.ts         # Security headers
 ```
@@ -58,7 +82,7 @@ A production-ready, reusable authentication template built on **Next.js 16** (Ap
 ### 1. Clone & install
 
 ```bash
-git clone <your-repo-url> my-app
+git clone https://github.com/nachiketgalande1609/nextjslogin.git my-app
 cd my-app
 npm install
 ```
@@ -71,6 +95,7 @@ Edit `.env.local` and fill in all required values:
 | Variable | Required | Description |
 |---|---|---|
 | `DATABASE_URL` | Yes | MySQL connection string |
+| `AIVEN_DB_PASSWORD` | Yes | Password used by `scripts/create-db.mjs` |
 | `JWT_ACCESS_SECRET` | Yes | Min 64-char random secret |
 | `JWT_REFRESH_SECRET` | Yes | Min 64-char random secret |
 | `CSRF_SECRET` | Yes | Min 32-char random secret |
@@ -90,6 +115,8 @@ node -e "const c=require('crypto');['JWT_ACCESS_SECRET','JWT_REFRESH_SECRET'].fo
 ```bash
 node scripts/create-db.mjs
 ```
+
+> Reads `AIVEN_DB_PASSWORD` from your environment. Set it in `.env.local` before running.
 
 ### 4. Run migrations
 
@@ -171,7 +198,8 @@ Import `postman-collection.json` into Postman or Insomnia.
 3. Update `APP_URL` in `.env.local`
 4. Configure SMTP and OAuth credentials
 5. Customise pages in `app/auth/` and `app/components/`
-6. Add your own pages — automatically protected by `proxy.ts`
+6. Update branding in `config/site.ts`
+7. Add your own pages — automatically protected by `proxy.ts`
 
 To protect a new route, add it to `PROTECTED_ROUTES` in `proxy.ts`.  
 To add admin-only access, add it to `ADMIN_ROUTES` in `proxy.ts` and call `requireAdmin()` in the page.
