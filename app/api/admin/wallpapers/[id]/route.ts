@@ -37,6 +37,7 @@ export async function DELETE(
     select: { storagePath: true, thumbPath: true, previewPath: true },
   })
 
+  await prisma.purchase.deleteMany({ where: { wallpaperId: id } })
   await prisma.wallpaper.delete({ where: { id } })
 
   if (wallpaper) {

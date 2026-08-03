@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
     select: { storagePath: true, thumbPath: true, previewPath: true },
   })
 
+  await prisma.purchase.deleteMany({ where: { wallpaperId: { in: ids } } })
   await prisma.wallpaper.deleteMany({ where: { id: { in: ids } } })
 
   const keys = wallpapers.flatMap((w) => [
