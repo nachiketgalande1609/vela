@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function WallpaperDetailPage({ params }: PageProps) {
   const { id } = await params
 
-  let wallpaper: Awaited<ReturnType<typeof prisma.wallpaper.findUnique>> | null = null
+  let wallpaper: { id: string; title: string; description: string | null; price: number; category: string; tags: string; previewPath: string; thumbPath: string; width: number; height: number; storagePath: string } | null = null
   let session: Awaited<ReturnType<typeof verifySession>> = null
 
   try {
