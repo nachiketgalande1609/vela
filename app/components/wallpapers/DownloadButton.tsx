@@ -33,28 +33,35 @@ export function DownloadButton({ wallpaperId, className }: DownloadButtonProps) 
   }
 
   return (
-    <button
-      onClick={handleDownload}
-      disabled={loading}
-      className={`
-        flex items-center gap-2 rounded-[4px] bg-[var(--accent)] text-black font-medium text-sm px-5 py-2.5
-        cursor-pointer
-        md:hover:bg-[var(--accent-hover)] md:transition-colors
-        disabled:opacity-60 disabled:cursor-not-allowed
-        ${className ?? ''}
-      `}
-    >
-      {loading ? (
-        <>
-          <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-          Preparing…
-        </>
-      ) : (
-        <>
-          <Download className="h-4 w-4 shrink-0" />
-          Download
-        </>
+    <div className="flex flex-col gap-2">
+      <button
+        onClick={handleDownload}
+        disabled={loading}
+        className={`
+          flex items-center gap-2 rounded-[4px] bg-[var(--accent)] text-black font-medium text-sm px-5 py-2.5
+          cursor-pointer
+          md:hover:bg-[var(--accent-hover)] md:transition-colors
+          disabled:opacity-60 disabled:cursor-not-allowed
+          ${className ?? ''}
+        `}
+      >
+        {loading ? (
+          <>
+            <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+            Preparing…
+          </>
+        ) : (
+          <>
+            <Download className="h-4 w-4 shrink-0" />
+            Download
+          </>
+        )}
+      </button>
+      {loading && (
+        <p className="text-center text-[11px] text-[var(--text-muted)]">
+          Your download will start shortly…
+        </p>
       )}
-    </button>
+    </div>
   )
 }
