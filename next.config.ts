@@ -2,12 +2,12 @@ import type { NextConfig } from 'next'
 
 const ContentSecurityPolicy = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  img-src 'self' data: https:;
+  img-src 'self' data: blob: https:;
   font-src 'self' data: https://fonts.gstatic.com;
-  connect-src 'self' https://accounts.google.com https://api.github.com https://api.stripe.com;
-  frame-src https://js.stripe.com https://hooks.stripe.com;
+  connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com;
+  frame-src https://api.razorpay.com https://checkout.razorpay.com;
   frame-ancestors 'none';
   base-uri 'self';
   form-action 'self';
@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'localhost' },
+      { protocol: 'https', hostname: 'vela-wallpaper-bucket.s3.us-east-1.amazonaws.com' },
     ],
   },
   async headers() {

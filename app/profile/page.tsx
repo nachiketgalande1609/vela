@@ -1,6 +1,8 @@
 import { requireAuth, getUser } from '@/lib/auth/dal'
-import { AppShell } from '@/app/components/layout/AppShell'
+import { PublicNav } from '@/app/components/layout/PublicNav'
 import { User, Mail, ShieldCheck, CalendarDays, BadgeCheck } from 'lucide-react'
+
+export const metadata = { title: 'Profile — Vela' }
 
 export default async function ProfilePage() {
   const session = await requireAuth()
@@ -20,43 +22,52 @@ export default async function ProfilePage() {
   ]
 
   return (
-    <AppShell>
-      <div className="border-b border-neutral-200 bg-white px-8 py-6">
-        <h1 className="text-xl font-semibold text-neutral-900">Profile</h1>
-        <p className="mt-0.5 text-sm text-neutral-500">Your account details</p>
-      </div>
+    <div className="min-h-screen bg-[var(--bg)]">
+      <PublicNav />
 
-      <div className="max-w-2xl space-y-6 p-8">
+      <div className="mx-auto max-w-2xl px-6 py-12">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-[var(--text)]" style={{ fontFamily: 'var(--font-playfair)' }}>
+            Profile
+          </h1>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">Your account details</p>
+        </div>
+
         {/* Avatar card */}
-        <div className="flex items-center gap-5 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xl font-bold text-white ring-4 ring-neutral-100">
+        <div className="mb-4 flex items-center gap-5 rounded-[4px] border border-[var(--border)] bg-[var(--surface)] p-6">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[var(--accent)]/15 text-xl font-bold text-[var(--accent)]">
             {initials}
           </div>
           <div>
-            <p className="text-lg font-semibold text-neutral-900">{user.name ?? 'User'}</p>
-            <p className="text-sm text-neutral-500">{user.email}</p>
-            <span className={`mt-2 inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium
-              ${user.role === 'ADMIN' ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-700'}`}>
+            <p className="text-lg font-semibold text-[var(--text)]">{user.name ?? 'User'}</p>
+            <p className="text-sm text-[var(--text-muted)]">{user.email}</p>
+            <span className={`mt-2 inline-flex rounded-[4px] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wide
+              ${user.role === 'ADMIN'
+                ? 'bg-[var(--accent)]/15 text-[var(--accent)]'
+                : 'bg-[var(--surface-2)] text-[var(--text-muted)] border border-[var(--border)]'}`}>
               {user.role}
             </span>
           </div>
         </div>
 
         {/* Details */}
-        <div className="divide-y divide-neutral-100 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
-          {rows.map(({ icon: Icon, label, value }) => (
-            <div key={label} className="flex items-center gap-4 px-6 py-4">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-neutral-100">
-                <Icon className="h-4 w-4 text-neutral-500" />
+        <div className="overflow-hidden rounded-[4px] border border-[var(--border)] bg-[var(--surface)]">
+          {rows.map(({ icon: Icon, label, value }, i) => (
+            <div
+              key={label}
+              className={`flex items-center gap-4 px-6 py-4 ${i > 0 ? 'border-t border-[var(--border)]' : ''}`}
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[4px] bg-[var(--surface-2)]">
+                <Icon className="h-4 w-4 text-[var(--text-muted)]" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-neutral-400">{label}</p>
-                <p className="mt-0.5 truncate text-sm font-medium text-neutral-900">{value}</p>
+                <p className="text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)]">{label}</p>
+                <p className="mt-0.5 truncate text-sm text-[var(--text)]">{value}</p>
               </div>
             </div>
           ))}
         </div>
       </div>
-    </AppShell>
+    </div>
   )
 }

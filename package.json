@@ -17,6 +17,8 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1101.0",
+    "@aws-sdk/s3-request-presigner": "^3.1101.0",
     "@prisma/client": "^6.19.3",
     "@stripe/stripe-js": "^9.12.1",
     "bcryptjs": "^3.0.2",
@@ -25,6 +27,7 @@
     "lucide-react": "^1.28.0",
     "next": "16.2.12",
     "nodemailer": "^7.0.3",
+    "razorpay": "^2.9.8",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hot-toast": "^2.5.2",

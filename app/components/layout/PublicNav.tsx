@@ -1,9 +1,11 @@
 import Link from 'next/link'
-import { verifySession } from '@/lib/auth/dal'
+import { verifySession, getUser } from '@/lib/auth/dal'
 import { siteConfig } from '@/config/site'
+import { NavDropdown } from './NavDropdown'
 
 export async function PublicNav() {
   const session = await verifySession()
+  const user = session ? await getUser(session.id) : null
 
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/90 backdrop-blur-sm">
@@ -12,29 +14,14 @@ export async function PublicNav() {
           {siteConfig.name}
         </Link>
 
-        <nav className="hidden sm:flex items-center gap-8">
-          <Link href="/" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-            Browse
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-3">
-          {session ? (
-            <Link href="/dashboard"
-              className="rounded-[4px] bg-[var(--surface-2)] border border-[var(--border)] text-sm font-medium text-[var(--text)] px-4 py-2 hover:border-[var(--accent)]/40 transition-colors">
-              Dashboard
-            </Link>
+<div className="flex items-center gap-3">
+          {user ? (
+            <NavDropdown name={user.name ?? user.email} role={user.role as 'ADMIN' | 'USER'} />
           ) : (
-            <>
-              <Link href="/auth/login"
-                className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-                Sign In
-              </Link>
-              <Link href="/auth/register"
-                className="rounded-[4px] bg-[var(--accent)] text-black font-medium text-sm px-4 py-2 hover:bg-[var(--accent-hover)] transition-colors">
-                Get started
-              </Link>
-            </>
+            <Link href="/auth/login"
+              className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+              Sign In
+            </Link>
           )}
         </div>
       </div>

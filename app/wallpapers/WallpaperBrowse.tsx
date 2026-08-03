@@ -7,11 +7,17 @@ interface WallpaperBrowseProps {
   isAuthenticated: boolean
 }
 
+interface AccessData {
+  hasSubscription: boolean
+  ownedIds: string[]
+}
+
 export function WallpaperBrowse({ isAuthenticated }: WallpaperBrowseProps) {
   const [wallpapers, setWallpapers] = useState<WallpaperCardData[]>([])
   const [page, setPage] = useState(1)
   const [pages, setPages] = useState(1)
   const [loading, setLoading] = useState(true)
+  const [access, setAccess] = useState<AccessData>({ hasSubscription: false, ownedIds: [] })
 
   const fetchWallpapers = useCallback(async (pg: number) => {
     setLoading(true)
@@ -29,9 +35,17 @@ export function WallpaperBrowse({ isAuthenticated }: WallpaperBrowseProps) {
     }
   }, [])
 
+  useEffect(() => { void fetchWallpapers(page) }, [page, fetchWallpapers])
+
   useEffect(() => {
-    void fetchWallpapers(page)
-  }, [page, fetchWallpapers])
+    if (!isAuthenticated) return
+    fetch('/api/user/access')
+      .then((r) => r.json() as Promise<AccessData>)
+      .then(setAccess)
+      .catch(() => {/* leave defaults */})
+  }, [isAuthenticated])
+
+  const isOwned = (id: string) => access.hasSubscription || access.ownedIds.includes(id)
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">
@@ -48,7 +62,12 @@ export function WallpaperBrowse({ isAuthenticated }: WallpaperBrowseProps) {
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {wallpapers.map((w) => (
-            <WallpaperCard key={w.id} wallpaper={w} isAuthenticated={isAuthenticated} />
+            <WallpaperCard
+              key={w.id}
+              wallpaper={w}
+              isAuthenticated={isAuthenticated}
+              owned={isOwned(w.id)}
+            />
           ))}
         </div>
       )}

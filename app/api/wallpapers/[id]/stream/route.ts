@@ -42,5 +42,5 @@ export async function GET(
   }
 
   const filename = `vela-${wallpaper.title.toLowerCase().replace(/\s+/g, '-')}.jpg`
-  return streamFileResponse(wallpaper.storagePath, filename)
+  return await streamFileResponse(wallpaper.storagePath, filename)
 }

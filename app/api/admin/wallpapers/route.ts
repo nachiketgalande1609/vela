@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile } from 'fs/promises'
-import path from 'path'
+import sharp from 'sharp'
 import { requireAdmin } from '@/lib/auth/dal'
 import { prisma } from '@/lib/db/prisma'
 import { generatePreviews } from '@/lib/wallpapers/generate-previews'
-
-const PRIVATE_DIR = path.join(process.cwd(), 'private', 'wallpapers')
+import { uploadToS3 } from '@/lib/storage/s3'
 
 export async function GET() {
   await requireAdmin()
@@ -34,31 +32,39 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
-  const bytes = await file.arrayBuffer()
-  const buffer = Buffer.from(bytes)
-  const ext = file.name.split('.').pop() ?? 'jpg'
-  const filename = `${crypto.randomUUID()}.${ext}`
-  const storagePath = filename
+  try {
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase()
+    const uuid = crypto.randomUUID()
+    const storageKey = `wallpapers/${uuid}.${ext}`
 
-  await writeFile(path.join(PRIVATE_DIR, filename), buffer)
+    const metadata = await sharp(buffer).metadata()
+    const width = metadata.width ?? 1080
+    const height = metadata.height ?? 1920
 
-  const { thumbPath, previewPath } = await generatePreviews(
-    path.join(PRIVATE_DIR, filename),
-    storagePath.replace(`.${ext}`, '')
-  )
+    await uploadToS3(storageKey, buffer, file.type || 'image/jpeg', false)
 
-  const wallpaper = await prisma.wallpaper.create({
-    data: {
-      title,
-      description: description ?? undefined,
-      category,
-      tags,
-      price,
-      storagePath,
-      previewPath,
-      thumbPath,
-    },
-  })
+    const { thumbPath, previewPath } = await generatePreviews(buffer, uuid)
 
-  return NextResponse.json({ wallpaper }, { status: 201 })
+    const wallpaper = await prisma.wallpaper.create({
+      data: {
+        title,
+        description: description ?? undefined,
+        category,
+        tags,
+        price,
+        storagePath: storageKey,
+        previewPath,
+        thumbPath,
+        width,
+        height,
+      },
+    })
+
+    return NextResponse.json({ wallpaper }, { status: 201 })
+  } catch (err) {
+    console.error('[upload]', err)
+    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+  }
 }

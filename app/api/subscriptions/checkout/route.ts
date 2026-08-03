@@ -1,38 +1,32 @@
 import { NextResponse } from 'next/server'
-import Stripe from 'stripe'
 import { requireAuth } from '@/lib/auth/dal'
 import { prisma } from '@/lib/db/prisma'
+import { razorpay } from '@/lib/payment/razorpay'
 import { env } from '@/lib/env'
-
-const stripe = new Stripe(env.STRIPE_SECRET_KEY)
 
 export async function POST() {
   const session = await requireAuth()
 
-  if (!env.STRIPE_SUBSCRIPTION_PRICE_ID) {
+  if (!env.RAZORPAY_PLAN_ID) {
     return NextResponse.json({ error: 'Subscriptions not configured.' }, { status: 503 })
   }
 
-  // If user already has an active subscription, return a billing portal URL
+  // If already active, return existing subscription ID for re-auth
   const existing = await prisma.subscription.findUnique({ where: { userId: session.id } })
   if (existing?.status === 'active' && new Date() < existing.currentPeriodEnd) {
-    if (existing.stripeCustomerId) {
-      const portal = await stripe.billingPortal.sessions.create({
-        customer: existing.stripeCustomerId,
-        return_url: `${env.APP_URL}/dashboard`,
-      })
-      return NextResponse.json({ url: portal.url })
-    }
-    return NextResponse.json({ error: 'Already subscribed.' }, { status: 400 })
+    return NextResponse.json({ subscriptionId: existing.subscriptionId })
   }
 
-  const checkoutSession = await stripe.checkout.sessions.create({
-    mode: 'subscription',
-    line_items: [{ price: env.STRIPE_SUBSCRIPTION_PRICE_ID, quantity: 1 }],
-    metadata: { userId: session.id },
-    success_url: `${env.APP_URL}/dashboard?subscribed=true`,
-    cancel_url: `${env.APP_URL}/`,
-  })
-
-  return NextResponse.json({ url: checkoutSession.url })
+  try {
+    const sub = await razorpay.subscriptions.create({
+      plan_id: env.RAZORPAY_PLAN_ID,
+      total_count: 600, // 50 years — effectively perpetual
+      quantity: 1,
+      notes: { userId: session.id },
+    })
+    return NextResponse.json({ subscriptionId: sub.id })
+  } catch (err) {
+    console.error('Razorpay subscription error:', err)
+    return NextResponse.json({ error: 'Payment unavailable — use the test button or configure Razorpay.' }, { status: 503 })
+  }
 }

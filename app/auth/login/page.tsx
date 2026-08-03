@@ -39,7 +39,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (state?.ok) {
       toast.success('Welcome back!')
-      router.push(state.role === 'ADMIN' ? '/admin/wallpapers' : '/dashboard')
+      router.push('/')
     } else if (state?.error) {
       toast.error(state.error)
     }

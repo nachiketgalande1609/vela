@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth/dal'
 import { prisma } from '@/lib/db/prisma'
+import { deleteManyFromS3, s3KeyFromUrl } from '@/lib/storage/s3'
 
 export async function PATCH(
   req: NextRequest,
@@ -8,7 +9,14 @@ export async function PATCH(
 ) {
   await requireAdmin()
   const { id } = await params
-  const body = await req.json() as { published?: boolean; title?: string; price?: number }
+  const body = await req.json() as {
+    published?: boolean
+    title?: string
+    price?: number
+    category?: string
+    tags?: string
+    description?: string
+  }
 
   const wallpaper = await prisma.wallpaper.update({
     where: { id },
@@ -23,6 +31,22 @@ export async function DELETE(
 ) {
   await requireAdmin()
   const { id } = await params
+
+  const wallpaper = await prisma.wallpaper.findUnique({
+    where: { id },
+    select: { storagePath: true, thumbPath: true, previewPath: true },
+  })
+
   await prisma.wallpaper.delete({ where: { id } })
+
+  if (wallpaper) {
+    const keys = [
+      wallpaper.storagePath,
+      s3KeyFromUrl(wallpaper.thumbPath),
+      s3KeyFromUrl(wallpaper.previewPath),
+    ].filter(Boolean)
+    await deleteManyFromS3(keys).catch(() => {}) // non-fatal
+  }
+
   return NextResponse.json({ deleted: true })
 }

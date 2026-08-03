@@ -43,7 +43,7 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
         select: {
           id: true, title: true, description: true, price: true,
           category: true, tags: true, previewPath: true, thumbPath: true,
-          width: true, height: true,
+          width: true, height: true, storagePath: true,
         },
       }),
       verifySession(),
@@ -55,10 +55,19 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
   if (!wallpaper) notFound()
 
   let canAccess = false
+  let ownedIds: string[] = []
+  let hasSubscription = false
   if (session) {
     try {
-      canAccess = await canDownload(session.id, id)
-    } catch { /* DB unavailable — treat as no access */ }
+      const [access, sub, purchases] = await Promise.all([
+        canDownload(session.id, id),
+        prisma.subscription.findUnique({ where: { userId: session.id }, select: { status: true, currentPeriodEnd: true } }),
+        prisma.purchase.findMany({ where: { userId: session.id }, select: { wallpaperId: true } }),
+      ])
+      canAccess = access
+      hasSubscription = sub?.status === 'active' && new Date() < (sub?.currentPeriodEnd ?? 0)
+      ownedIds = purchases.map((p) => p.wallpaperId)
+    } catch { /* DB unavailable */ }
   }
 
   let related: { id: string; title: string; price: number; category: string; thumbPath: string }[] = []
@@ -122,7 +131,7 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
 
             <div className="flex items-center gap-3">
               <span className="text-3xl font-bold text-[var(--accent)]" style={{ fontFamily: 'var(--font-playfair)' }}>
-                ${wallpaper.price.toFixed(2)}
+                ₹{wallpaper.price.toFixed(0)}
               </span>
               <span className="text-xs text-[var(--text-muted)]">one-time purchase</span>
             </div>
@@ -166,7 +175,7 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
 
             <div className="rounded-[4px] border border-[var(--border)] bg-[var(--surface)] p-4 text-xs text-[var(--text-muted)] space-y-1">
               <p>Resolution: {wallpaper.width} × {wallpaper.height}px</p>
-              <p>Format: JPEG, optimised for mobile</p>
+              <p>Format: {(wallpaper.storagePath.split('.').pop() ?? 'jpg').toUpperCase()}, optimised for mobile</p>
               <p>Licence: Personal use only</p>
             </div>
           </div>
@@ -179,7 +188,12 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
             </h2>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {related.map((w) => (
-                <WallpaperCard key={w.id} wallpaper={w} isAuthenticated={!!session} />
+                <WallpaperCard
+                  key={w.id}
+                  wallpaper={w}
+                  isAuthenticated={!!session}
+                  owned={hasSubscription || ownedIds.includes(w.id)}
+                />
               ))}
             </div>
           </div>

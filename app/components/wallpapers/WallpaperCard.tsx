@@ -14,9 +14,10 @@ export interface WallpaperCardData {
 interface WallpaperCardProps {
   wallpaper: WallpaperCardData
   isAuthenticated: boolean
+  owned?: boolean
 }
 
-export function WallpaperCard({ wallpaper, isAuthenticated }: WallpaperCardProps) {
+export function WallpaperCard({ wallpaper, isAuthenticated, owned = false }: WallpaperCardProps) {
   const [hovered, setHovered] = useState(false)
 
   return (
@@ -46,9 +47,15 @@ export function WallpaperCard({ wallpaper, isAuthenticated }: WallpaperCardProps
         </div>
 
         <div className="absolute top-2 right-2">
-          <span className="bg-[var(--accent)] text-black text-[10px] font-bold px-1.5 py-0.5 rounded-[4px]">
-            ${wallpaper.price.toFixed(2)}
-          </span>
+          {owned ? (
+            <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-1.5 py-0.5 rounded-[4px]">
+              Owned
+            </span>
+          ) : (
+            <span className="bg-[var(--accent)] text-black text-[10px] font-bold px-1.5 py-0.5 rounded-[4px]">
+              ₹{wallpaper.price.toFixed(0)}
+            </span>
+          )}
         </div>
       </div>
     </Link>
