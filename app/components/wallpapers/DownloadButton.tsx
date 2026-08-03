@@ -22,22 +22,8 @@ export function DownloadButton({ wallpaperId, className }: DownloadButtonProps) 
         return
       }
 
-      const fileRes = await fetch(`/api/wallpapers/${wallpaperId}/stream?token=${tokenData.token}`)
-      if (!fileRes.ok) {
-        toast.error('Could not retrieve file')
-        return
-      }
-
-      const blob = await fileRes.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `vela-wallpaper.jpg`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-      toast.success('Download started')
+      // Let the browser follow the S3 redirect natively — avoids CORS on the presigned URL
+      window.location.href = `/api/wallpapers/${wallpaperId}/stream?token=${tokenData.token}`
     } catch {
       toast.error('Download failed')
     } finally {
