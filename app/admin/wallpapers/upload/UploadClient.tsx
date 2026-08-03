@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { Upload, CheckCircle2, AlertCircle, Loader2, X } from 'lucide-react'
 
 const CATEGORIES = ['Abstract', 'Nature', 'Dark', 'Minimal', 'Architecture', 'Neon', 'Uncategorised']
+const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20 MB
 const inputClass = 'w-full rounded-[4px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)] transition-colors'
 const inputSm = 'w-full rounded-[4px] border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1.5 text-xs text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)] transition-colors'
 
@@ -37,6 +38,7 @@ export function UploadClient() {
   const fileRef = useRef<HTMLInputElement>(null)
 
   const pickFile = (f: File) => {
+    if (f.size > MAX_FILE_SIZE) { toast.error('File too large — max 20 MB'); return }
     setFile(f)
     setPreview(URL.createObjectURL(f))
     if (!form.title) setForm((p) => ({ ...p, title: nameToTitle(f.name) }))
@@ -76,7 +78,11 @@ export function UploadClient() {
   const addBulkFiles = (files: FileList | File[]) => {
     const arr = Array.from(files).filter((f) => f.type.startsWith('image/'))
     if (!arr.length) return
-    setBulkFiles((prev) => [...prev, ...arr.map((f) => ({
+    const oversized = arr.filter((f) => f.size > MAX_FILE_SIZE)
+    if (oversized.length) toast.error(`${oversized.length} file${oversized.length > 1 ? 's' : ''} skipped — max 20 MB each`)
+    const valid = arr.filter((f) => f.size <= MAX_FILE_SIZE)
+    if (!valid.length) return
+    setBulkFiles((prev) => [...prev, ...valid.map((f) => ({
       uid: crypto.randomUUID(), file: f, objectUrl: URL.createObjectURL(f),
       title: nameToTitle(f.name), category: 'Abstract', tags: '', price: '99', status: 'pending' as const,
     }))])

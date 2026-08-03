@@ -32,6 +32,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
+  const MAX_SIZE = 20 * 1024 * 1024
+  if (file.size > MAX_SIZE) {
+    return NextResponse.json({ error: 'File too large (max 20 MB)' }, { status: 413 })
+  }
+
   try {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
