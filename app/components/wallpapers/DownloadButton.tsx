@@ -23,7 +23,6 @@ export function DownloadButton({ wallpaperId, className }: DownloadButtonProps) 
         return
       }
 
-      // Navigate to stream route — server redirects to S3 presigned URL with Content-Disposition: attachment
       window.location.href = `/api/wallpapers/${wallpaperId}/stream?token=${tokenData.token}`
     } catch {
       toast.error('Download failed')
@@ -33,7 +32,15 @@ export function DownloadButton({ wallpaperId, className }: DownloadButtonProps) 
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <>
+      {/* Fixed top-right indicator while download is preparing */}
+      {loading && (
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 rounded-[4px] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 shadow-lg">
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-[var(--accent)]" />
+          <span className="text-xs text-[var(--text-muted)]">Download starting…</span>
+        </div>
+      )}
+
       <button
         onClick={handleDownload}
         disabled={loading}
@@ -57,11 +64,6 @@ export function DownloadButton({ wallpaperId, className }: DownloadButtonProps) 
           </>
         )}
       </button>
-      {loading && (
-        <p className="text-center text-[11px] text-[var(--text-muted)]">
-          Your download will start shortly…
-        </p>
-      )}
-    </div>
+    </>
   )
 }
