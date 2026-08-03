@@ -7,6 +7,11 @@ export async function GET() {
   const session = await verifySession()
   if (!session) return NextResponse.json({ hasSubscription: false, ownedIds: [] })
 
+  const user = await prisma.user.findUnique({ where: { id: session.id }, select: { role: true } })
+  if (user?.role === 'ADMIN') {
+    return NextResponse.json({ hasSubscription: true, ownedIds: [] })
+  }
+
   const [purchases, subscription] = await Promise.all([
     prisma.purchase.findMany({
       where: { userId: session.id },
