@@ -50,7 +50,11 @@ export function s3KeyFromUrl(url: string): string {
   try { return new URL(url).pathname.slice(1) } catch { return url }
 }
 
-export async function getPresignedDownloadUrl(key: string, expiresInSeconds = 60): Promise<string> {
-  const command = new GetObjectCommand({ Bucket: env.AWS_S3_BUCKET, Key: key })
+export async function getPresignedDownloadUrl(key: string, expiresInSeconds = 60, filename?: string): Promise<string> {
+  const command = new GetObjectCommand({
+    Bucket: env.AWS_S3_BUCKET,
+    Key: key,
+    ...(filename && { ResponseContentDisposition: `attachment; filename="${filename}"` }),
+  })
   return getSignedUrl(s3, command, { expiresIn: expiresInSeconds })
 }
