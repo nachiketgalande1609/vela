@@ -26,21 +26,27 @@ interface Props {
 }
 
 export function SubscribeButton({ isAuthenticated, className = '' }: Props) {
-  const [loading, setLoading] = useState<'rzp' | 'fake' | null>(null)
-  const [unavailable, setUnavailable] = useState(false)
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSubscribe = async () => {
     if (!isAuthenticated) { router.push('/auth/login'); return }
-    setLoading('rzp')
+    setLoading(true)
     try {
       const res = await fetch('/api/subscriptions/checkout', { method: 'POST' })
       const data = await res.json() as { subscriptionId?: string; error?: string }
-      if (res.status === 503) { setUnavailable(true); return }
-      if (!res.ok || !data.subscriptionId) { toast.error(data.error ?? 'Could not start subscription'); return }
+      if (!res.ok || !data.subscriptionId) {
+        toast.error(data.error ?? 'Could not start subscription')
+        setLoading(false)
+        return
+      }
 
       const loaded = await loadRazorpay()
-      if (!loaded) { toast.error('Could not load payment widget'); return }
+      if (!loaded) {
+        toast.error('Could not load payment widget')
+        setLoading(false)
+        return
+      }
 
       const rzp = new window.Razorpay({
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -54,6 +60,7 @@ export function SubscribeButton({ isAuthenticated, className = '' }: Props) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(response),
           })
+          setLoading(false)
           if (verify.ok) {
             toast.success('Subscription active!')
             window.location.reload()
@@ -61,29 +68,12 @@ export function SubscribeButton({ isAuthenticated, className = '' }: Props) {
             toast.error('Payment verification failed')
           }
         },
-        modal: { ondismiss: () => setLoading(null) },
+        modal: { ondismiss: () => setLoading(false) },
       })
       rzp.open()
     } catch {
       toast.error('Something went wrong')
-    } finally {
-      setLoading(null)
-    }
-  }
-
-  const handleFakeSubscribe = async () => {
-    if (!isAuthenticated) { router.push('/auth/login'); return }
-    setLoading('fake')
-    try {
-      const res = await fetch('/api/fake-payment/subscribe', { method: 'POST' })
-      const data = await res.json() as { ok?: boolean; error?: string }
-      if (!res.ok) { toast.error(data.error ?? 'Fake subscribe failed'); return }
-      toast.success('Subscription active for 30 days!')
-      window.location.reload()
-    } catch {
-      toast.error('Something went wrong')
-    } finally {
-      setLoading(null)
+      setLoading(false)
     }
   }
 
@@ -97,21 +87,9 @@ export function SubscribeButton({ isAuthenticated, className = '' }: Props) {
   }
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
-      {unavailable ? (
-        <div className="rounded-[4px] border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-xs text-[var(--text-muted)]">
-          Razorpay is not configured yet. Use the test button below.
-        </div>
-      ) : (
-        <button onClick={handleSubscribe} disabled={!!loading}
-          className="w-full rounded-[4px] border border-[var(--accent)]/40 bg-transparent text-[var(--accent)] font-medium text-sm px-5 py-2.5 hover:bg-[var(--accent)]/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-          {loading === 'rzp' ? 'Opening payment…' : 'Subscribe — ₹499 / month'}
-        </button>
-      )}
-      <button onClick={handleFakeSubscribe} disabled={!!loading}
-        className="w-full rounded-[4px] border border-dashed border-yellow-500/40 bg-yellow-500/5 text-yellow-400 text-xs font-medium px-5 py-2 hover:bg-yellow-500/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-        {loading === 'fake' ? 'Processing…' : '⚡ Test: Fake subscribe (30 days free)'}
-      </button>
-    </div>
+    <button onClick={handleSubscribe} disabled={loading}
+      className={`w-full rounded-[4px] border border-[var(--accent)]/40 bg-transparent text-[var(--accent)] font-medium text-sm px-5 py-2.5 hover:bg-[var(--accent)]/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${className}`}>
+      {loading ? 'Opening payment…' : 'Subscribe — ₹499 / month'}
+    </button>
   )
 }

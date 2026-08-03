@@ -32,6 +32,6 @@ export async function POST(
     return NextResponse.json({ orderId: order.id, amount: order.amount, currency: order.currency, title: wallpaper.title })
   } catch (err) {
     console.error('Razorpay order error:', err)
-    return NextResponse.json({ error: 'Payment unavailable — use the test button or configure Razorpay.' }, { status: 503 })
+    return NextResponse.json({ error: 'Payment unavailable. Please try again later.' }, { status: 503 })
   }
 }
