@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation'
 import { requireAuth, getUser } from '@/lib/auth/dal'
+import { PageHeader } from '@/app/components/layout/PageHeader'
+import { User, Mail } from 'lucide-react'
 import { prisma } from '@/lib/db/prisma'
 import { PublicNav } from '@/app/components/layout/PublicNav'
-import { LogoutAllButton } from '@/app/components/auth/LogoutButton'
-import { DownloadButton } from '@/app/components/wallpapers/DownloadButton'
-import Image from 'next/image'
 import Link from 'next/link'
+import { PurchasedGrid } from './PurchasedGrid'
 
 export const metadata = { title: 'My Library — Vela' }
 
@@ -46,16 +46,33 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-[var(--bg)]">
       <PublicNav />
 
-      <div className="mx-auto max-w-5xl px-6 py-10 space-y-8">
+      <div className="mx-auto max-w-7xl px-6 py-8 space-y-8">
 
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--text)]" style={{ fontFamily: 'var(--font-playfair)' }}>
-            My Library
-          </h1>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">
-            {user?.name ?? user?.email}
-          </p>
+        <PageHeader
+          title="My Library"
+          breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'My Library' }]}
+        />
+
+        {/* User details */}
+        <div className="rounded-[4px] border border-[var(--border)] bg-[var(--surface)] divide-y divide-[var(--border)]">
+          <div className="flex items-center gap-4 px-5 py-4">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[4px] bg-[var(--surface-2)]">
+              <User className="h-4 w-4 text-[var(--text-muted)]" />
+            </div>
+            <div>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)]">Full Name</p>
+              <p className="mt-0.5 text-sm text-[var(--text)]">{user?.name ?? '—'}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 px-5 py-4">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[4px] bg-[var(--surface-2)]">
+              <Mail className="h-4 w-4 text-[var(--text-muted)]" />
+            </div>
+            <div>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)]">Email</p>
+              <p className="mt-0.5 text-sm text-[var(--text)]">{user?.email}</p>
+            </div>
+          </div>
         </div>
 
         {/* Admin panel / Subscription status */}
@@ -104,59 +121,11 @@ export default async function DashboardPage() {
             )}
           </h2>
 
-          {purchases.length === 0 ? (
-            <div className="py-10 text-center space-y-3">
-              <p className="text-sm text-[var(--text-muted)]">You haven&apos;t purchased any wallpapers yet.</p>
-              <Link
-                href="/"
-                className="inline-block text-xs font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors"
-              >
-                Browse the collection →
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-              {purchases.map(({ wallpaper, id: purchaseId }) => (
-                <div key={purchaseId} className="rounded-[4px] border border-[var(--border)] overflow-hidden bg-[var(--surface-2)]">
-                  <Link href={`/wallpapers/${wallpaper.id}`}>
-                    <div className="relative aspect-[9/16]">
-                      <Image
-                        src={wallpaper.thumbPath}
-                        alt={wallpaper.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 50vw, 25vw"
-                        draggable={false}
-                        onContextMenu={(e) => e.preventDefault()}
-                      />
-                    </div>
-                  </Link>
-                  <div className="p-3 space-y-2">
-                    <div>
-                      <p className="text-xs font-medium text-[var(--text)] truncate">{wallpaper.title}</p>
-                      <p className="text-[10px] text-[var(--text-muted)]">{wallpaper.category}</p>
-                    </div>
-                    <DownloadButton
-                      wallpaperId={wallpaper.id}
-                      className="w-full justify-center text-xs py-1.5 px-3"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <PurchasedGrid
+            purchases={purchases.map(({ wallpaper, id: purchaseId }) => ({ purchaseId, wallpaper }))}
+          />
         </div>
 
-        {/* Session management */}
-        <div className="rounded-[4px] border border-[var(--border)] bg-[var(--surface)] p-5">
-          <h2 className="text-sm font-medium uppercase tracking-widest text-[var(--text-muted)] mb-1">
-            Session management
-          </h2>
-          <p className="text-xs text-[var(--text-muted)] mb-4">
-            Sign out from all devices. Use this if you think your account has been compromised.
-          </p>
-          <LogoutAllButton />
-        </div>
 
       </div>
     </div>

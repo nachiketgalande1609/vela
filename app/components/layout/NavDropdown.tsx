@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, User, CreditCard, LogOut, LayoutDashboard } from 'lucide-react'
+import { ChevronDown, CreditCard, LogOut, LayoutDashboard, ShieldCheck } from 'lucide-react'
 import { getCsrfCookie } from '@/app/components/providers/CsrfProvider'
 
 interface Props {
@@ -58,32 +58,32 @@ export function NavDropdown({ name, role }: Props) {
           {role === 'ADMIN' ? (
             <>
               <Link
+                href="/admin"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] transition-colors"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                Overview
+              </Link>
+              <Link
                 href="/admin/wallpapers"
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] transition-colors"
               >
                 <LayoutDashboard className="h-4 w-4" />
-                Dashboard
+                Wallpapers
               </Link>
               <div className="my-1 border-t border-[var(--border)]" />
             </>
           ) : (
             <>
               <Link
-                href="/profile"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] transition-colors"
-              >
-                <User className="h-4 w-4" />
-                Profile
-              </Link>
-              <Link
                 href="/dashboard"
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] transition-colors"
               >
                 <CreditCard className="h-4 w-4" />
-                Subscription
+                My Library
               </Link>
               <div className="my-1 border-t border-[var(--border)]" />
             </>

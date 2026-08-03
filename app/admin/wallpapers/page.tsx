@@ -21,7 +21,7 @@ export default async function AdminWallpapersPage() {
   return (
     <div className="min-h-screen bg-[var(--bg)]">
       <PublicNav />
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-6 py-8">
         <AdminWallpapersClient initial={rows} />
       </div>
     </div>

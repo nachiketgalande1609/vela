@@ -3,7 +3,7 @@ import { useState, useRef, Fragment, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import { Trash2, Plus, ChevronDown, ChevronUp, Trash, Check, Loader2, IndianRupee } from 'lucide-react'
+import { Trash2, Plus, ChevronDown, ChevronUp, Trash, Check, Loader2, IndianRupee, ChevronRight } from 'lucide-react'
 
 interface WallpaperRow {
   id: string
@@ -227,6 +227,13 @@ export function AdminWallpapersClient({ initial }: { initial: WallpaperRow[] }) 
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
+          <nav className="flex items-center gap-1 mb-3">
+            <Link href="/" className="text-xs text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">Home</Link>
+            <ChevronRight className="h-3 w-3 text-[var(--border)]" />
+            <Link href="/admin" className="text-xs text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">Admin</Link>
+            <ChevronRight className="h-3 w-3 text-[var(--border)]" />
+            <span className="text-xs text-[var(--text-muted)]">Wallpapers</span>
+          </nav>
           <h1 className="text-2xl font-bold text-[var(--text)]" style={{ fontFamily: 'var(--font-playfair)' }}>Wallpapers</h1>
           <p className="text-sm text-[var(--text-muted)] mt-0.5">{wallpapers.length} total</p>
         </div>
