@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Trash2, Eye, EyeOff, Package } from 'lucide-react'
+import { Trash2, Package } from 'lucide-react'
 
 interface Pack {
   id: string
@@ -61,8 +61,7 @@ export function AdminPacksClient({ packs: initial }: { packs: Pack[] }) {
             <th className="px-4 py-3 text-left text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)] w-20">Price</th>
             <th className="px-4 py-3 text-left text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)] w-24">Wallpapers</th>
             <th className="px-4 py-3 text-left text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)] w-24">Sales</th>
-            <th className="px-4 py-3 text-left text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)] w-24">Status</th>
-            <th className="px-4 py-3 w-20" />
+            <th className="px-4 py-3 w-36" />
           </tr>
         </thead>
         <tbody>
@@ -73,15 +72,12 @@ export function AdminPacksClient({ packs: initial }: { packs: Pack[] }) {
               <td className="px-4 py-3 text-[var(--text-muted)]">{pack._count.wallpapers}</td>
               <td className="px-4 py-3 text-[var(--text-muted)]">{pack._count.purchases}</td>
               <td className="px-4 py-3">
-                <span className={`inline-flex items-center rounded-[2px] px-2 py-0.5 text-[10px] font-medium ${pack.published ? 'bg-emerald-500/10 text-emerald-400' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}>
-                  {pack.published ? 'Published' : 'Draft'}
-                </span>
-              </td>
-              <td className="px-4 py-3">
                 <div className="flex items-center gap-2 justify-end">
-                  <button onClick={() => togglePublish(pack)} title={pack.published ? 'Unpublish' : 'Publish'}
-                    className="text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">
-                    {pack.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  <button
+                    onClick={() => togglePublish(pack)}
+                    className={`rounded-[4px] px-3 py-1.5 text-[10px] font-medium uppercase tracking-wide border transition-colors ${pack.published ? 'border-red-500/30 text-red-400 hover:bg-red-500/10' : 'border-[var(--accent)]/50 text-[var(--accent)] hover:bg-[var(--accent)]/10'}`}
+                  >
+                    {pack.published ? 'Unpublish' : 'Publish'}
                   </button>
                   <button onClick={() => deletePack(pack)} title="Delete"
                     className="text-[var(--text-muted)] hover:text-red-400 transition-colors">
