@@ -55,13 +55,28 @@ export function UploadClient() {
     if (!file) { toast.error('Select a file'); return }
     setUploading(true)
     try {
-      const fd = new FormData()
-      fd.append('file', file); fd.append('title', form.title)
-      fd.append('description', form.description); fd.append('category', form.category)
-      fd.append('tags', form.tags); fd.append('price', form.price)
-      const res = await fetch('/api/admin/wallpapers', { method: 'POST', body: fd })
-      const data = await res.json() as { wallpaper?: unknown; error?: string }
-      if (!res.ok || !data.wallpaper) { toast.error(data.error ?? 'Upload failed'); return }
+      // 1. Get presigned S3 upload URL
+      const presignRes = await fetch('/api/admin/wallpapers/presign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, contentType: file.type || 'image/jpeg' }),
+      })
+      const { uploadUrl, key, uuid } = await presignRes.json() as { uploadUrl: string; key: string; uuid: string }
+      if (!presignRes.ok || !uploadUrl) { toast.error('Could not get upload URL'); return }
+
+      // 2. Upload directly to S3 (bypasses Vercel size limit)
+      const s3Res = await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'image/jpeg' } })
+      if (!s3Res.ok) { toast.error('S3 upload failed'); return }
+
+      // 3. Confirm — server generates previews & saves to DB
+      const confirmRes = await fetch('/api/admin/wallpapers/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, uuid, title: form.title, description: form.description, category: form.category, tags: form.tags, price: parseFloat(form.price) }),
+      })
+      const data = await confirmRes.json() as { wallpaper?: unknown; error?: string }
+      if (!confirmRes.ok || !data.wallpaper) { toast.error(data.error ?? 'Processing failed'); return }
+
       toast.success('Uploaded — previews generated')
       setFile(null); setPreview(null)
       setForm({ title: '', description: '', category: 'Abstract', tags: '', price: '99' })
@@ -112,20 +127,34 @@ export function UploadClient() {
     for (const bf of pending) {
       setBulkFiles((prev) => prev.map((f) => f.uid === bf.uid ? { ...f, status: 'uploading' } : f))
       try {
-        const fd = new FormData()
-        fd.append('file', bf.file); fd.append('title', bf.title || nameToTitle(bf.file.name))
-        fd.append('category', bf.category); fd.append('tags', bf.tags)
-        fd.append('price', bf.price || '99'); fd.append('description', '')
-        const res = await fetch('/api/admin/wallpapers', { method: 'POST', body: fd })
-        const data = await res.json() as { wallpaper?: unknown; error?: string }
-        if (!res.ok || !data.wallpaper) {
+        // 1. Presign
+        const presignRes = await fetch('/api/admin/wallpapers/presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: bf.file.name, contentType: bf.file.type || 'image/jpeg' }),
+        })
+        const { uploadUrl, key, uuid } = await presignRes.json() as { uploadUrl: string; key: string; uuid: string }
+        if (!presignRes.ok || !uploadUrl) throw new Error('Could not get upload URL')
+
+        // 2. Direct S3 upload
+        const s3Res = await fetch(uploadUrl, { method: 'PUT', body: bf.file, headers: { 'Content-Type': bf.file.type || 'image/jpeg' } })
+        if (!s3Res.ok) throw new Error('S3 upload failed')
+
+        // 3. Confirm
+        const confirmRes = await fetch('/api/admin/wallpapers/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key, uuid, title: bf.title || nameToTitle(bf.file.name), category: bf.category, tags: bf.tags, price: parseFloat(bf.price || '99'), description: '' }),
+        })
+        const data = await confirmRes.json() as { wallpaper?: unknown; error?: string }
+        if (!confirmRes.ok || !data.wallpaper) {
           setBulkFiles((prev) => prev.map((f) => f.uid === bf.uid ? { ...f, status: 'error', errorMsg: data.error ?? 'Failed' } : f))
         } else {
           setBulkFiles((prev) => prev.map((f) => f.uid === bf.uid ? { ...f, status: 'done' } : f))
           uploaded++
         }
-      } catch {
-        setBulkFiles((prev) => prev.map((f) => f.uid === bf.uid ? { ...f, status: 'error', errorMsg: 'Network error' } : f))
+      } catch (err) {
+        setBulkFiles((prev) => prev.map((f) => f.uid === bf.uid ? { ...f, status: 'error', errorMsg: err instanceof Error ? err.message : 'Network error' } : f))
       }
     }
     setBulkUploading(false)

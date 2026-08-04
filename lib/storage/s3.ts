@@ -50,6 +50,24 @@ export function s3KeyFromUrl(url: string): string {
   try { return new URL(url).pathname.slice(1) } catch { return url }
 }
 
+export async function getPresignedUploadUrl(key: string, contentType: string, expiresInSeconds = 300): Promise<string> {
+  const command = new PutObjectCommand({
+    Bucket: env.AWS_S3_BUCKET,
+    Key: key,
+    ContentType: contentType,
+  })
+  return getSignedUrl(s3, command, { expiresIn: expiresInSeconds })
+}
+
+export async function downloadFromS3(key: string): Promise<Buffer> {
+  const response = await s3.send(new GetObjectCommand({ Bucket: env.AWS_S3_BUCKET, Key: key }))
+  const chunks: Uint8Array[] = []
+  for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
+    chunks.push(chunk)
+  }
+  return Buffer.concat(chunks)
+}
+
 export async function getPresignedDownloadUrl(key: string, expiresInSeconds = 60, filename?: string): Promise<string> {
   const command = new GetObjectCommand({
     Bucket: env.AWS_S3_BUCKET,
