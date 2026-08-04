@@ -3,9 +3,6 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { ShoppingBag, Loader2 } from 'lucide-react'
 
-declare global {
-  interface Window { Razorpay: new (opts: unknown) => { open(): void; on(e: string, cb: () => void): void } }
-}
 
 async function loadRazorpay(): Promise<boolean> {
   if (typeof window.Razorpay !== 'undefined') return true

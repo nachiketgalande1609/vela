@@ -3,11 +3,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 
-declare global {
-  interface Window {
-    Razorpay: new (options: Record<string, unknown>) => { open(): void }
-  }
-}
 
 function loadRazorpay(): Promise<boolean> {
   return new Promise((resolve) => {
