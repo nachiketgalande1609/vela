@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { verifySession, getUser } from '@/lib/auth/dal'
 import { siteConfig } from '@/config/site'
 import { NavDropdown } from './NavDropdown'
+import { GenreDropdown } from './GenreDropdown'
 
 export async function PublicNav() {
   const session = await verifySession()
@@ -15,6 +16,7 @@ export async function PublicNav() {
         </Link>
 
 <div className="flex items-center gap-5">
+          <GenreDropdown />
           <Link href="/packs" className="hidden sm:block text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
             Packs
           </Link>

@@ -1,10 +1,11 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { WallpaperCard, type WallpaperCardData } from '@/app/components/wallpapers/WallpaperCard'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
 interface WallpaperBrowseProps {
   isAuthenticated: boolean
+  category?: string
 }
 
 interface AccessData {
@@ -12,37 +13,63 @@ interface AccessData {
   ownedIds: string[]
 }
 
-export function WallpaperBrowse({ isAuthenticated }: WallpaperBrowseProps) {
+export function WallpaperBrowse({ isAuthenticated, category }: WallpaperBrowseProps) {
   const [wallpapers, setWallpapers] = useState<WallpaperCardData[]>([])
   const [page, setPage] = useState(1)
-  const [pages, setPages] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [access, setAccess] = useState<AccessData>({ hasSubscription: false, ownedIds: [] })
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
-  const fetchWallpapers = useCallback(async (pg: number) => {
-    setLoading(true)
+  const fetchPage = useCallback(async (pg: number) => {
     try {
-      const res = await fetch(`/api/wallpapers?page=${pg}`)
-      if (!res.ok) { setWallpapers([]); setPages(0); return }
+      const qs = category ? `page=${pg}&category=${encodeURIComponent(category)}` : `page=${pg}`
+      const res = await fetch(`/api/wallpapers?${qs}`)
+      if (!res.ok) return
       const data = await res.json() as { wallpapers: WallpaperCardData[]; pages: number }
-      setWallpapers(data.wallpapers ?? [])
-      setPages(data.pages ?? 0)
-    } catch {
-      setWallpapers([])
-      setPages(0)
-    } finally {
-      setLoading(false)
-    }
+      const incoming = data.wallpapers ?? []
+      setWallpapers((prev) => pg === 1 ? incoming : [...prev, ...incoming])
+      setHasMore(pg < (data.pages ?? 1))
+    } catch { /* leave state */ }
   }, [])
 
-  useEffect(() => { void fetchWallpapers(page) }, [page, fetchWallpapers])
+  // Initial load
+  useEffect(() => {
+    setLoading(true)
+    fetchPage(1).finally(() => setLoading(false))
+  }, [fetchPage])
 
+  // Intersection observer — triggers when sentinel enters viewport
+  useEffect(() => {
+    if (!hasMore) return
+    const el = sentinelRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMore) {
+          setPage((prev) => {
+            const next = prev + 1
+            setLoadingMore(true)
+            fetchPage(next).finally(() => setLoadingMore(false))
+            return next
+          })
+        }
+      },
+      { rootMargin: '200px' }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasMore, loadingMore, fetchPage])
+
+  // Access data
   useEffect(() => {
     if (!isAuthenticated) return
     fetch('/api/user/access')
       .then((r) => r.json() as Promise<AccessData>)
       .then(setAccess)
-      .catch(() => {/* leave defaults */})
+      .catch(() => {})
   }, [isAuthenticated])
 
   const isOwned = (id: string) => access.hasSubscription || access.ownedIds.includes(id)
@@ -60,36 +87,33 @@ export function WallpaperBrowse({ isAuthenticated }: WallpaperBrowseProps) {
           No wallpapers available yet.
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {wallpapers.map((w) => (
-            <WallpaperCard
-              key={w.id}
-              wallpaper={w}
-              isAuthenticated={isAuthenticated}
-              owned={isOwned(w.id)}
-            />
-          ))}
-        </div>
-      )}
+        <>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {wallpapers.map((w) => (
+              <WallpaperCard
+                key={w.id}
+                wallpaper={w}
+                isAuthenticated={isAuthenticated}
+                owned={isOwned(w.id)}
+              />
+            ))}
+          </div>
 
-      {pages > 1 && (
-        <div className="mt-10 flex items-center justify-center gap-4">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-            className="flex items-center gap-1 rounded-[4px] border border-[var(--border)] px-4 py-2 text-sm text-[var(--text-muted)] hover:border-[var(--accent)]/40 hover:text-[var(--text)] disabled:opacity-40 transition-colors"
-          >
-            <ChevronLeft className="h-4 w-4" /> Prev
-          </button>
-          <span className="text-sm text-[var(--text-muted)]">Page {page} of {pages}</span>
-          <button
-            onClick={() => setPage((p) => Math.min(pages, p + 1))}
-            disabled={page === pages}
-            className="flex items-center gap-1 rounded-[4px] border border-[var(--border)] px-4 py-2 text-sm text-[var(--text-muted)] hover:border-[var(--accent)]/40 hover:text-[var(--text)] disabled:opacity-40 transition-colors"
-          >
-            Next <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
+          {/* Sentinel — observed to trigger next page load */}
+          <div ref={sentinelRef} className="h-1" />
+
+          {loadingMore && (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-5 w-5 animate-spin text-[var(--accent)]" />
+            </div>
+          )}
+
+          {!hasMore && wallpapers.length > 0 && (
+            <p className="py-8 text-center text-xs text-[var(--text-muted)]">
+              You&apos;ve seen everything
+            </p>
+          )}
+        </>
       )}
     </div>
   )

@@ -4,13 +4,8 @@ import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { Upload, CheckCircle2, AlertCircle, Loader2, X } from 'lucide-react'
 
-const CATEGORIES = [
-  'Abstract', 'Anime', 'Architecture', 'Cars', 'City',
-  'Cyberpunk', 'Dark', 'Fantasy', 'Floral', 'Gaming',
-  'Minimal', 'Nature', 'Neon', 'Ocean', 'Retro',
-  'Sci-Fi', 'Space', 'Sports', 'Typography', 'Wildlife',
-  'Uncategorised',
-]
+import { CATEGORIES as BASE_CATEGORIES } from '@/lib/categories'
+const CATEGORIES = [...BASE_CATEGORIES, 'Uncategorised']
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50 MB
 const inputClass = 'w-full rounded-[4px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)] transition-colors'
 const inputSm = 'w-full rounded-[4px] border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1.5 text-xs text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)] transition-colors'

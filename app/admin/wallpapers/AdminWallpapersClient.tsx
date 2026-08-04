@@ -15,13 +15,8 @@ interface WallpaperRow {
   createdAt: string
 }
 
-const CATEGORIES = [
-  'Abstract', 'Anime', 'Architecture', 'Cars', 'City',
-  'Cyberpunk', 'Dark', 'Fantasy', 'Floral', 'Gaming',
-  'Minimal', 'Nature', 'Neon', 'Ocean', 'Retro',
-  'Sci-Fi', 'Space', 'Sports', 'Typography', 'Wildlife',
-  'Uncategorised',
-]
+import { CATEGORIES as BASE_CATEGORIES } from '@/lib/categories'
+const CATEGORIES = [...BASE_CATEGORIES, 'Uncategorised']
 const inputClass = 'w-full rounded-[4px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)] transition-colors'
 
 // ── Dialogs ────────────────────────────────────────────────────────────────────
