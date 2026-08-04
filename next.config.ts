@@ -6,7 +6,7 @@ const ContentSecurityPolicy = `
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' data: blob: https:;
   font-src 'self' data: https://fonts.gstatic.com;
-  connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com;
+  connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com https://vela-wallpaper-bucket.s3.us-east-1.amazonaws.com;
   frame-src https://api.razorpay.com https://checkout.razorpay.com;
   frame-ancestors 'none';
   base-uri 'self';
