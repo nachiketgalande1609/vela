@@ -9,7 +9,7 @@ interface Pack {
   title: string
   price: number
   published: boolean
-  createdAt: string
+  createdAt: Date | string
   _count: { wallpapers: number; purchases: number }
 }
 
