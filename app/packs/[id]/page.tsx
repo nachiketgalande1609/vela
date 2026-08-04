@@ -81,14 +81,9 @@ export default async function PackDetailPage({ params }: PageProps) {
                     src={w.thumbPath}
                     alt={w.title}
                     fill
-                    className={`object-cover ${!owned ? 'blur-sm scale-105' : ''}`}
+                    className="object-cover"
                     sizes="(max-width: 640px) 50vw, 25vw"
                   />
-                  {!owned && (
-                    <div className="absolute inset-0 flex items-end p-2">
-                      <span className="rounded-[2px] bg-black/60 px-1.5 py-0.5 text-[9px] text-[var(--text-muted)] backdrop-blur-sm">Preview</span>
-                    </div>
-                  )}
                 </Link>
               ))}
             </div>

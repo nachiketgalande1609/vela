@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Suspense } from 'react'
 import { prisma } from '@/lib/db/prisma'
 import { verifySession } from '@/lib/auth/dal'
@@ -10,8 +11,9 @@ import { DownloadButton } from '@/app/components/wallpapers/DownloadButton'
 import { SubscribeButton } from '@/app/components/wallpapers/SubscribeButton'
 import { canDownload } from '@/lib/wallpapers/can-download'
 import { WallpaperCard } from '@/app/components/wallpapers/WallpaperCard'
+import { BuyPackButton } from '@/app/components/packs/BuyPackButton'
 import { PurchaseSuccessBanner } from './PurchaseSuccessBanner'
-import { Tag } from 'lucide-react'
+import { Tag, Package } from 'lucide-react'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -33,7 +35,8 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function WallpaperDetailPage({ params }: PageProps) {
   const { id } = await params
 
-  let wallpaper: { id: string; title: string; description: string | null; price: number; category: string; tags: string; previewPath: string; thumbPath: string; width: number; height: number; storagePath: string } | null = null
+  type WallpaperData = { id: string; title: string; description: string | null; price: number; category: string; tags: string; previewPath: string; thumbPath: string; width: number; height: number; storagePath: string }
+  let wallpaper: WallpaperData | null = null
   let session: Awaited<ReturnType<typeof verifySession>> = null
 
   try {
@@ -57,18 +60,43 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
   let canAccess = false
   let ownedIds: string[] = []
   let hasSubscription = false
+  let ownedPackIds: string[] = []
   if (session) {
     try {
-      const [access, sub, purchases] = await Promise.all([
+      const [access, sub, purchases, packPurchases] = await Promise.all([
         canDownload(session.id, id),
         prisma.subscription.findUnique({ where: { userId: session.id }, select: { status: true, currentPeriodEnd: true } }),
         prisma.purchase.findMany({ where: { userId: session.id }, select: { wallpaperId: true } }),
+        prisma.packPurchase.findMany({ where: { userId: session.id }, select: { packId: true } }),
       ])
       canAccess = access
       hasSubscription = sub?.status === 'active' && new Date() < (sub?.currentPeriodEnd ?? 0)
       ownedIds = purchases.map((p) => p.wallpaperId)
+      ownedPackIds = packPurchases.map((p) => p.packId)
     } catch { /* DB unavailable */ }
   }
+
+  // Packs this wallpaper belongs to
+  let wallpaperPacks: { id: string; title: string; price: number; _count: { wallpapers: number }; wallpapers: { wallpaper: { thumbPath: string } }[] }[] = []
+  try {
+    const rows = await prisma.wallpaperOnPack.findMany({
+      where: { wallpaperId: id, pack: { published: true } },
+      select: {
+        pack: {
+          select: {
+            id: true, title: true, price: true,
+            _count: { select: { wallpapers: true } },
+            wallpapers: {
+              take: 4,
+              orderBy: { order: 'asc' },
+              select: { wallpaper: { select: { thumbPath: true } } },
+            },
+          },
+        },
+      },
+    })
+    wallpaperPacks = rows.map((r) => r.pack)
+  } catch { /* non-fatal */ }
 
   let related: { id: string; title: string; price: number; category: string; thumbPath: string }[] = []
   try {
@@ -172,6 +200,47 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
                 </div>
               )}
             </div>
+
+            {wallpaperPacks.length > 0 && (
+              <div className="flex flex-col gap-3">
+                {wallpaperPacks.map((pack) => {
+                  const packOwned = ownedPackIds.includes(pack.id) || hasSubscription
+                  return (
+                    <div key={pack.id} className="rounded-[4px] border border-[var(--accent)]/20 bg-[var(--surface)] p-4">
+                      <div className="flex items-start gap-3 mb-3">
+                        {/* 2×2 collage */}
+                        <Link href={`/packs/${pack.id}`} className="shrink-0">
+                          <div className="grid grid-cols-2 w-16 h-16 rounded-[3px] overflow-hidden">
+                            {pack.wallpapers.slice(0, 4).map((w, i) => (
+                              <div key={i} className="relative overflow-hidden">
+                                <Image src={w.wallpaper.thumbPath} alt="" fill className="object-cover" sizes="32px" />
+                              </div>
+                            ))}
+                            {Array.from({ length: Math.max(0, 4 - pack.wallpapers.length) }).map((_, i) => (
+                              <div key={`e${i}`} className="bg-[var(--surface-2)]" />
+                            ))}
+                          </div>
+                        </Link>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-widest text-[var(--text-muted)] mb-0.5">Also available in</p>
+                          <Link href={`/packs/${pack.id}`} className="text-sm font-medium text-[var(--text)] hover:text-[var(--accent)] transition-colors">
+                            {pack.title}
+                          </Link>
+                          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                            {pack._count.wallpapers} wallpapers · ₹{pack.price.toFixed(0)}
+                          </p>
+                        </div>
+                      </div>
+                      {packOwned ? (
+                        <p className="text-xs text-[var(--accent)]">You own this pack</p>
+                      ) : (
+                        <BuyPackButton packId={pack.id} price={pack.price} isAuthenticated={!!session} className="w-full justify-center text-sm" />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
 
             <div className="rounded-[4px] border border-[var(--border)] bg-[var(--surface)] p-4 text-xs text-[var(--text-muted)] space-y-1">
               <p>Resolution: {wallpaper.width} × {wallpaper.height}px</p>
