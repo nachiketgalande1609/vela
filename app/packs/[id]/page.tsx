@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import Image from 'next/image'
 import { prisma } from '@/lib/db/prisma'
 import { verifySession } from '@/lib/auth/dal'
@@ -75,7 +76,7 @@ export default async function PackDetailPage({ params }: PageProps) {
           <div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
               {wallpapers.map((w) => (
-                <div key={w.id} className="relative rounded-[4px] border border-[var(--border)] overflow-hidden" style={{ aspectRatio: '9/16' }}>
+                <Link key={w.id} href={`/wallpapers/${w.id}`} className="relative rounded-[4px] border border-[var(--border)] overflow-hidden block" style={{ aspectRatio: '9/16' }}>
                   <Image
                     src={w.thumbPath}
                     alt={w.title}
@@ -88,12 +89,7 @@ export default async function PackDetailPage({ params }: PageProps) {
                       <span className="rounded-[2px] bg-black/60 px-1.5 py-0.5 text-[9px] text-[var(--text-muted)] backdrop-blur-sm">Preview</span>
                     </div>
                   )}
-                  {owned && (
-                    <div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 hover:opacity-100 transition-opacity bg-gradient-to-t from-black/70">
-                      <DownloadButton wallpaperId={w.id} className="w-full justify-center text-[10px] py-1" />
-                    </div>
-                  )}
-                </div>
+                </Link>
               ))}
             </div>
           </div>

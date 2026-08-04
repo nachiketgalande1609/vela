@@ -15,6 +15,11 @@ export default async function AdminPacksPage() {
     select: {
       id: true, title: true, price: true, published: true, createdAt: true,
       _count: { select: { wallpapers: true, purchases: true } },
+      wallpapers: {
+        take: 4,
+        orderBy: { order: 'asc' },
+        select: { wallpaper: { select: { thumbPath: true } } },
+      },
     },
   })
 

@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import toast from 'react-hot-toast'
 import { Trash2, Package, Loader2 } from 'lucide-react'
 
@@ -11,6 +12,7 @@ interface Pack {
   published: boolean
   createdAt: Date | string
   _count: { wallpapers: number; purchases: number }
+  wallpapers: { wallpaper: { thumbPath: string } }[]
 }
 
 export function AdminPacksClient({ packs: initial }: { packs: Pack[] }) {
@@ -69,6 +71,7 @@ export function AdminPacksClient({ packs: initial }: { packs: Pack[] }) {
       <table className="w-full text-sm">
         <thead className="border-b border-[var(--border)]">
           <tr>
+            <th className="px-4 py-3 w-20" />
             <th className="px-4 py-3 text-left text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)]">Title</th>
             <th className="px-4 py-3 text-left text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)] w-20">Price</th>
             <th className="px-4 py-3 text-left text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)] w-24">Wallpapers</th>
@@ -79,6 +82,18 @@ export function AdminPacksClient({ packs: initial }: { packs: Pack[] }) {
         <tbody>
           {packs.map((pack) => (
             <tr key={pack.id} className="border-t border-[var(--border)]/50 hover:bg-[var(--surface-2)] transition-colors">
+              <td className="px-4 py-2.5">
+                <div className="grid grid-cols-2 w-16 h-16 rounded-[3px] overflow-hidden shrink-0">
+                  {(pack.wallpapers ?? []).slice(0, 4).map((w, i) => (
+                    <div key={i} className="relative overflow-hidden">
+                      <Image src={w.wallpaper.thumbPath} alt="" fill className="object-cover" sizes="32px" />
+                    </div>
+                  ))}
+                  {Array.from({ length: Math.max(0, 4 - pack.wallpapers.length) }).map((_, i) => (
+                    <div key={`e${i}`} className="bg-[var(--surface-2)]" />
+                  ))}
+                </div>
+              </td>
               <td className="px-4 py-3 text-[var(--text)] font-medium">{pack.title}</td>
               <td className="px-4 py-3 text-[var(--accent)]">₹{pack.price.toFixed(0)}</td>
               <td className="px-4 py-3 text-[var(--text-muted)]">{pack._count.wallpapers}</td>
