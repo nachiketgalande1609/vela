@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Trash2, Package } from 'lucide-react'
+import { Trash2, Package, Loader2 } from 'lucide-react'
 
 interface Pack {
   id: string
@@ -16,29 +16,41 @@ interface Pack {
 export function AdminPacksClient({ packs: initial }: { packs: Pack[] }) {
   const router = useRouter()
   const [packs, setPacks] = useState(initial)
+  const [publishingId, setPublishingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const togglePublish = async (pack: Pack) => {
-    const res = await fetch(`/api/admin/packs/${pack.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ published: !pack.published }),
-    })
-    if (res.ok) {
-      setPacks((prev) => prev.map((p) => p.id === pack.id ? { ...p, published: !p.published } : p))
-      toast.success(pack.published ? 'Pack unpublished' : 'Pack published')
-    } else {
-      toast.error('Failed to update')
+    setPublishingId(pack.id)
+    try {
+      const res = await fetch(`/api/admin/packs/${pack.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ published: !pack.published }),
+      })
+      if (res.ok) {
+        setPacks((prev) => prev.map((p) => p.id === pack.id ? { ...p, published: !p.published } : p))
+        toast.success(pack.published ? 'Pack unpublished' : 'Pack published')
+      } else {
+        toast.error('Failed to update')
+      }
+    } finally {
+      setPublishingId(null)
     }
   }
 
   const deletePack = async (pack: Pack) => {
     if (!confirm(`Delete "${pack.title}"? This cannot be undone.`)) return
-    const res = await fetch(`/api/admin/packs/${pack.id}`, { method: 'DELETE' })
-    if (res.ok) {
-      setPacks((prev) => prev.filter((p) => p.id !== pack.id))
-      toast.success('Pack deleted')
-    } else {
-      toast.error('Delete failed')
+    setDeletingId(pack.id)
+    try {
+      const res = await fetch(`/api/admin/packs/${pack.id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setPacks((prev) => prev.filter((p) => p.id !== pack.id))
+        toast.success('Pack deleted')
+      } else {
+        toast.error('Delete failed')
+      }
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -75,13 +87,22 @@ export function AdminPacksClient({ packs: initial }: { packs: Pack[] }) {
                 <div className="flex items-center gap-2 justify-end">
                   <button
                     onClick={() => togglePublish(pack)}
-                    className={`rounded-[4px] px-3 py-1.5 text-[10px] font-medium uppercase tracking-wide border transition-colors ${pack.published ? 'border-red-500/30 text-red-400 hover:bg-red-500/10' : 'border-[var(--accent)]/50 text-[var(--accent)] hover:bg-[var(--accent)]/10'}`}
+                    disabled={publishingId === pack.id || deletingId === pack.id}
+                    className={`inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1.5 text-[10px] font-medium uppercase tracking-wide border transition-colors disabled:opacity-50 ${pack.published ? 'border-red-500/30 text-red-400 hover:bg-red-500/10' : 'border-[var(--accent)]/50 text-[var(--accent)] hover:bg-[var(--accent)]/10'}`}
                   >
-                    {pack.published ? 'Unpublish' : 'Publish'}
+                    {publishingId === pack.id
+                      ? <><Loader2 className="h-3 w-3 animate-spin" />{pack.published ? 'Unpublishing…' : 'Publishing…'}</>
+                      : pack.published ? 'Unpublish' : 'Publish'}
                   </button>
-                  <button onClick={() => deletePack(pack)} title="Delete"
-                    className="text-[var(--text-muted)] hover:text-red-400 transition-colors">
-                    <Trash2 className="h-4 w-4" />
+                  <button
+                    onClick={() => deletePack(pack)}
+                    disabled={deletingId === pack.id || publishingId === pack.id}
+                    title="Delete"
+                    className="text-[var(--text-muted)] hover:text-red-400 transition-colors disabled:opacity-50"
+                  >
+                    {deletingId === pack.id
+                      ? <Loader2 className="h-4 w-4 animate-spin" />
+                      : <Trash2 className="h-4 w-4" />}
                   </button>
                 </div>
               </td>

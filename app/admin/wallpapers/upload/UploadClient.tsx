@@ -23,6 +23,7 @@ interface BulkFile {
   price: string
   status: 'pending' | 'uploading' | 'done' | 'error'
   errorMsg?: string
+  wallpaperId?: string
 }
 
 export function UploadClient() {
@@ -88,6 +89,7 @@ export function UploadClient() {
   const [bulkFiles, setBulkFiles] = useState<BulkFile[]>([])
   const [bulkDragOver, setBulkDragOver] = useState(false)
   const [bulkUploading, setBulkUploading] = useState(false)
+  const [bulkPublishing, setBulkPublishing] = useState(false)
   const bulkInputRef = useRef<HTMLInputElement>(null)
 
   const addBulkFiles = (files: FileList | File[]) => {
@@ -146,11 +148,11 @@ export function UploadClient() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key, uuid, title: bf.title || nameToTitle(bf.file.name), category: bf.category, tags: bf.tags, price: parseFloat(bf.price || '99'), description: '' }),
         })
-        const data = await confirmRes.json() as { wallpaper?: unknown; error?: string }
+        const data = await confirmRes.json() as { wallpaper?: { id: string }; error?: string }
         if (!confirmRes.ok || !data.wallpaper) {
           setBulkFiles((prev) => prev.map((f) => f.uid === bf.uid ? { ...f, status: 'error', errorMsg: data.error ?? 'Failed' } : f))
         } else {
-          setBulkFiles((prev) => prev.map((f) => f.uid === bf.uid ? { ...f, status: 'done' } : f))
+          setBulkFiles((prev) => prev.map((f) => f.uid === bf.uid ? { ...f, status: 'done', wallpaperId: data.wallpaper!.id } : f))
           uploaded++
         }
       } catch (err) {
@@ -159,13 +161,34 @@ export function UploadClient() {
     }
     setBulkUploading(false)
     if (uploaded > 0) {
-      toast.success(`${uploaded} wallpaper${uploaded > 1 ? 's' : ''} uploaded`)
-      setTimeout(() => router.push('/admin/wallpapers'), 1200)
+      toast.success(`${uploaded} wallpaper${uploaded > 1 ? 's' : ''} uploaded — publish when ready`)
+    }
+  }
+
+  const publishUploadedBatch = async () => {
+    const ids = bulkFiles.filter((f) => f.status === 'done' && f.wallpaperId).map((f) => f.wallpaperId!)
+    if (!ids.length) { toast.error('No uploaded wallpapers to publish'); return }
+    setBulkPublishing(true)
+    try {
+      const res = await fetch('/api/admin/wallpapers/bulk-publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids, published: true }),
+      })
+      if (res.ok) {
+        toast.success(`${ids.length} wallpaper${ids.length > 1 ? 's' : ''} published`)
+        router.push('/admin/wallpapers')
+      } else {
+        toast.error('Publish failed')
+      }
+    } finally {
+      setBulkPublishing(false)
     }
   }
 
   const pendingCount = bulkFiles.filter((f) => f.status === 'pending').length
   const doneCount = bulkFiles.filter((f) => f.status === 'done').length
+  const unpublishedDoneCount = bulkFiles.filter((f) => f.status === 'done' && f.wallpaperId).length
 
   return (
     <div className="space-y-6">
@@ -314,12 +337,19 @@ export function UploadClient() {
                 </table>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button onClick={uploadAllBulk} disabled={bulkUploading || pendingCount === 0}
+              <div className="flex items-center gap-3 flex-wrap">
+                <button onClick={uploadAllBulk} disabled={bulkUploading || bulkPublishing || pendingCount === 0}
                   className="rounded-[4px] bg-[var(--accent)] px-5 py-2 text-sm font-medium text-black hover:bg-[var(--accent-hover)] disabled:opacity-50 transition-colors flex items-center gap-2">
                   {bulkUploading && <Loader2 className="h-4 w-4 animate-spin" />}
                   {bulkUploading ? 'Uploading…' : `Upload ${pendingCount > 0 ? pendingCount : ''} file${pendingCount !== 1 ? 's' : ''}`}
                 </button>
+                {unpublishedDoneCount > 0 && !bulkUploading && (
+                  <button onClick={publishUploadedBatch} disabled={bulkPublishing}
+                    className="rounded-[4px] border border-[var(--accent)]/50 text-[var(--accent)] hover:bg-[var(--accent)]/10 px-5 py-2 text-sm font-medium disabled:opacity-50 transition-colors flex items-center gap-2">
+                    {bulkPublishing && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {bulkPublishing ? 'Publishing…' : `Publish ${unpublishedDoneCount} uploaded`}
+                  </button>
+                )}
               </div>
             </>
           )}
