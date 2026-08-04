@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, CreditCard, LogOut, LayoutDashboard, ShieldCheck } from 'lucide-react'
+import { ChevronDown, CreditCard, LogOut, LayoutDashboard, ShieldCheck, Package } from 'lucide-react'
 import { getCsrfCookie } from '@/app/components/providers/CsrfProvider'
 
 interface Props {
@@ -72,6 +72,14 @@ export function NavDropdown({ name, role }: Props) {
               >
                 <LayoutDashboard className="h-4 w-4" />
                 Wallpapers
+              </Link>
+              <Link
+                href="/admin/packs"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] transition-colors"
+              >
+                <Package className="h-4 w-4" />
+                Packs
               </Link>
               <div className="my-1 border-t border-[var(--border)]" />
             </>

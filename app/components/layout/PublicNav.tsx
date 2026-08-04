@@ -14,7 +14,10 @@ export async function PublicNav() {
           {siteConfig.name}
         </Link>
 
-<div className="flex items-center gap-3">
+<div className="flex items-center gap-5">
+          <Link href="/packs" className="hidden sm:block text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+            Packs
+          </Link>
           {user ? (
             <NavDropdown name={user.name ?? user.email} role={user.role as 'ADMIN' | 'USER'} />
           ) : (

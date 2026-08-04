@@ -34,6 +34,7 @@ model User {
   tokens        VerificationToken[]
   purchases     Purchase[]
   subscription  Subscription?
+  packPurchases PackPurchase[]
 
   @@index([email])
 }
@@ -99,6 +100,7 @@ model Wallpaper {
   updatedAt   DateTime @updatedAt
 
   purchases Purchase[]
+  packs     WallpaperOnPack[]
 
   @@index([category])
   @@index([published])
@@ -131,6 +133,48 @@ model Subscription {
 
   user User @relation(fields: [userId], references: [id])
 
+  @@index([userId])
+}
+
+model Pack {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  price       Float    @default(250)
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  wallpapers WallpaperOnPack[]
+  purchases  PackPurchase[]
+
+  @@index([published])
+}
+
+model WallpaperOnPack {
+  packId      String
+  wallpaperId String
+  order       Int    @default(0)
+
+  pack      Pack      @relation(fields: [packId], references: [id], onDelete: Cascade)
+  wallpaper Wallpaper @relation(fields: [wallpaperId], references: [id], onDelete: Cascade)
+
+  @@id([packId, wallpaperId])
+  @@index([packId])
+}
+
+model PackPurchase {
+  id        String   @id @default(cuid())
+  userId    String
+  packId    String
+  paymentId String   @unique
+  amount    Float
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  pack Pack @relation(fields: [packId], references: [id])
+
+  @@unique([userId, packId])
   @@index([userId])
 }
 
