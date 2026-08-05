@@ -80,7 +80,7 @@ export function NavSearch() {
           onKeyDown={handleKeyDown}
           onFocus={() => { if (results.length > 0) setOpen(true) }}
           placeholder="Search wallpapers…"
-          className="w-full rounded-[4px] border border-[var(--border)] bg-[var(--surface-2)] py-1.5 pl-8 pr-8 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)] transition-colors"
+          className="w-full rounded-[4px] border border-white/8 bg-white/5 py-1.5 pl-8 pr-8 text-sm text-[var(--text)] placeholder:text-white/30 outline-none focus:border-[var(--accent)]/50 focus:bg-white/8 transition-all"
         />
         {query && (
           <button onClick={clear} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)]">
