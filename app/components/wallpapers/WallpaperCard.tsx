@@ -1,8 +1,7 @@
 'use client'
-import { useState } from 'react'
 import Link from 'next/link'
-import { Loader2 } from 'lucide-react'
 import { PreviewImage } from './PreviewImage'
+import { useNavigationLoading } from '@/app/components/providers/NavigationLoadingProvider'
 
 export interface WallpaperCardData {
   id: string
@@ -19,10 +18,10 @@ interface WallpaperCardProps {
 }
 
 export function WallpaperCard({ wallpaper, owned = false }: WallpaperCardProps) {
-  const [loading, setLoading] = useState(false)
+  const { startLoading } = useNavigationLoading()
 
   return (
-    <Link href={`/wallpapers/${wallpaper.id}`} onClick={() => setLoading(true)}>
+    <Link href={`/wallpapers/${wallpaper.id}`} onClick={startLoading}>
       <div className="relative rounded-[4px] border border-[var(--border)] overflow-hidden cursor-pointer group active:opacity-70 transition-opacity">
         <div className="transition-transform duration-500 ease-out group-hover:scale-105 will-change-transform">
           <PreviewImage
@@ -46,12 +45,6 @@ export function WallpaperCard({ wallpaper, owned = false }: WallpaperCardProps) 
             </span>
           )}
         </div>
-
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-            <Loader2 className="h-6 w-6 animate-spin text-[var(--accent)]" />
-          </div>
-        )}
       </div>
     </Link>
   )

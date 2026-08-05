@@ -3,6 +3,7 @@ import { Playfair_Display, Inter, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { ToastProvider } from '@/app/components/providers/ToastProvider'
 import { CsrfProvider } from '@/app/components/providers/CsrfProvider'
+import { NavigationLoadingProvider } from '@/app/components/providers/NavigationLoadingProvider'
 import { ImageProtection } from '@/app/components/ImageProtection'
 import { siteConfig } from '@/config/site'
 
@@ -36,9 +37,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={`${playfair.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[var(--bg)] text-[var(--text)]">
         <CsrfProvider>
-          <ImageProtection />
-          {children}
-          <ToastProvider />
+          <NavigationLoadingProvider>
+            <ImageProtection />
+            {children}
+            <ToastProvider />
+          </NavigationLoadingProvider>
         </CsrfProvider>
       </body>
     </html>
