@@ -6,12 +6,10 @@ import { prisma } from '@/lib/db/prisma'
 import { verifySession } from '@/lib/auth/dal'
 import { PublicNav } from '@/app/components/layout/PublicNav'
 import { PreviewImage } from '@/app/components/wallpapers/PreviewImage'
-import { PurchaseButton } from '@/app/components/wallpapers/PurchaseButton'
 import { DownloadButton } from '@/app/components/wallpapers/DownloadButton'
 import { SubscribeButton } from '@/app/components/wallpapers/SubscribeButton'
 import { canDownload } from '@/lib/wallpapers/can-download'
 import { WallpaperCard } from '@/app/components/wallpapers/WallpaperCard'
-import { BuyPackButton } from '@/app/components/packs/BuyPackButton'
 import { WallpaperDetailActions } from '@/app/components/wallpapers/WallpaperDetailActions'
 import { PurchaseSuccessBanner } from './PurchaseSuccessBanner'
 import { Tag, Package } from 'lucide-react'
@@ -221,19 +219,9 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
-                    <PurchaseButton
-                      wallpaperId={id}
-                      price={wallpaper.price}
-                      isAuthenticated={!!session}
-                    />
-                    <div className="flex items-center gap-3">
-                      <div className="h-px flex-1 bg-[var(--border)]" />
-                      <span className="text-xs text-[var(--text-muted)]">or</span>
-                      <div className="h-px flex-1 bg-[var(--border)]" />
-                    </div>
                     <SubscribeButton isAuthenticated={!!session} className="w-full justify-center" />
                     <p className="text-center text-[10px] text-[var(--text-muted)]">
-                      Subscribe once — download every wallpaper on Vela
+                      Vela+ — download every wallpaper on Vela
                     </p>
                   </div>
                 )}
@@ -273,7 +261,13 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
                       {packOwned ? (
                         <p className="text-xs text-[var(--accent)]">You own this pack</p>
                       ) : (
-                        <BuyPackButton packId={pack.id} price={pack.price} isAuthenticated={!!session} className="w-full justify-center text-sm" />
+                        <Link
+                          href={`/packs/${pack.id}`}
+                          className="flex items-center justify-center gap-2 w-full rounded-[4px] bg-[var(--accent)] px-4 py-2 text-sm font-medium text-black hover:bg-[var(--accent-hover)] transition-colors"
+                        >
+                          <Package className="h-4 w-4" />
+                          View Pack — ₹{pack.price.toFixed(0)}
+                        </Link>
                       )}
                     </div>
                   )

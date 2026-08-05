@@ -18,21 +18,25 @@ export async function POST(req: NextRequest) {
   const sub = await razorpay.subscriptions.fetch(razorpay_subscription_id)
   const currentPeriodEnd = new Date((sub.current_end as number) * 1000)
 
-  await prisma.subscription.upsert({
-    where: { userId: session.id },
-    create: {
-      userId: session.id,
-      subscriptionId: razorpay_subscription_id,
-      customerId: (sub.customer_id as string) ?? '',
-      status: 'active',
-      currentPeriodEnd,
-    },
-    update: {
-      subscriptionId: razorpay_subscription_id,
-      status: 'active',
-      currentPeriodEnd,
-    },
-  })
+  await Promise.all([
+    prisma.subscription.upsert({
+      where: { userId: session.id },
+      create: {
+        userId: session.id,
+        subscriptionId: razorpay_subscription_id,
+        customerId: (sub.customer_id as string) ?? '',
+        status: 'active',
+        currentPeriodEnd,
+      },
+      update: {
+        subscriptionId: razorpay_subscription_id,
+        status: 'active',
+        currentPeriodEnd,
+      },
+    }),
+    // Clear subscription cart item after successful payment
+    prisma.subscriptionCartItem.deleteMany({ where: { userId: session.id } }),
+  ])
 
   return NextResponse.json({ ok: true })
 }

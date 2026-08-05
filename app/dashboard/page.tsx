@@ -98,15 +98,15 @@ export default async function DashboardPage() {
                   Active — renews {subscription!.currentPeriodEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               ) : (
-                <p className="text-sm text-[var(--text-muted)]">No active subscription</p>
+                <p className="text-sm text-[var(--text-muted)]">No active Vela+ subscription</p>
               )}
             </div>
             {!isSubscribed && (
               <Link
-                href="/"
+                href="/vela-plus"
                 className="shrink-0 rounded-[4px] border border-[var(--accent)]/40 px-4 py-2 text-xs font-medium text-[var(--accent)] hover:bg-[var(--accent)]/10 transition-colors"
               >
-                Browse &amp; Subscribe
+                Get Vela+
               </Link>
             )}
           </div>

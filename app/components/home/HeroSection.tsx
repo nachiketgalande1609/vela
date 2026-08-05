@@ -40,12 +40,12 @@ export async function HeroSection({ isAuthenticated, hasSubscription }: Props) {
           </h1>
 
           <p className="text-[var(--text-muted)] text-sm leading-relaxed mb-6 max-w-sm mx-auto lg:mx-0">
-            Curated, high-resolution wallpapers built for your phone. Buy individual wallpapers for ₹99 or unlock everything with a subscription.
+            Curated, high-resolution wallpapers built for your phone. Buy individual wallpapers for ₹99 or unlock everything with Vela+.
           </p>
 
           {hasSubscription ? (
             <span className="text-xs text-[var(--accent)] border border-[var(--accent)]/30 bg-[var(--accent)]/10 rounded-[4px] px-3 py-2 inline-block">
-              ✓ Active subscription
+              ✓ Vela+ active
             </span>
           ) : (
             <div className="inline-flex flex-col gap-2 justify-center lg:justify-start w-fit">

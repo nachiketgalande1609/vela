@@ -79,10 +79,10 @@ export function WallpaperDetailActions({
       {!owned && !isFree && (
         <button
           onClick={addToCart}
-          className={`cursor-pointer flex items-center gap-2 flex-1 justify-center rounded-[4px] border px-4 py-2.5 text-sm font-medium transition-colors
+          className={`cursor-pointer flex items-center gap-2 flex-1 justify-center rounded-[4px] px-4 py-2.5 text-sm font-medium transition-colors
             ${inCart
-              ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent)]'
-              : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]'
+              ? 'border border-[var(--accent)]/40 bg-[var(--accent)]/15 text-[var(--accent)]'
+              : 'bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)]'
             }`}
         >
           <ShoppingCart size={15} />

@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db/prisma'
 import { verifySession } from '@/lib/auth/dal'
 import { PublicNav } from '@/app/components/layout/PublicNav'
 import { PageHeader } from '@/app/components/layout/PageHeader'
-import { BuyPackButton } from '@/app/components/packs/BuyPackButton'
+import { AddPackToCartButton } from '@/app/components/packs/AddPackToCartButton'
 import { DownloadButton } from '@/app/components/wallpapers/DownloadButton'
 import { CheckCircle2, Package } from 'lucide-react'
 
@@ -42,11 +42,12 @@ export default async function PackDetailPage({ params }: PageProps) {
   if (!pack) notFound()
 
   let owned = false
+  let initialInCart = false
   if (session) {
     if (session.role === 'ADMIN') {
       owned = true
     } else {
-      const [packPurchase, sub] = await Promise.all([
+      const [packPurchase, sub, cartRow] = await Promise.all([
         prisma.packPurchase.findUnique({
           where: { userId_packId: { userId: session.id, packId: id } },
           select: { id: true },
@@ -55,8 +56,12 @@ export default async function PackDetailPage({ params }: PageProps) {
           where: { userId: session.id },
           select: { status: true, currentPeriodEnd: true },
         }),
+        prisma.packCartItem.findUnique({
+          where: { userId_packId: { userId: session.id, packId: id } },
+        }),
       ])
       owned = !!packPurchase || (sub?.status === 'active' && new Date() < (sub?.currentPeriodEnd ?? 0))
+      initialInCart = !!cartRow
     }
   }
 
@@ -116,14 +121,14 @@ export default async function PackDetailPage({ params }: PageProps) {
                     <p className="text-xs text-[var(--text-muted)]">
                       ₹{(pack.price / pack._count.wallpapers).toFixed(0)} per wallpaper — save vs buying individually
                     </p>
-                    <BuyPackButton
-                      packId={pack.id}
-                      price={pack.price}
+                    <AddPackToCartButton
+                      packId={id}
                       isAuthenticated={!!session}
+                      initialInCart={initialInCart}
                       className="w-full justify-center"
                     />
                     <p className="text-[10px] text-[var(--text-muted)] text-center">
-                      Or get all packs free with a subscription
+                      Or get all packs free with Vela+
                     </p>
                   </div>
                 )}

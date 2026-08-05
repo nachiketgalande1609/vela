@@ -35,8 +35,10 @@ model User {
   purchases     Purchase[]
   subscription  Subscription?
   packPurchases PackPurchase[]
-  cartItems     CartItem[]
-  wishlists     Wishlist[]
+  cartItems             CartItem[]
+  packCartItems         PackCartItem[]
+  subscriptionCartItem  SubscriptionCartItem?
+  wishlists             Wishlist[]
 
   @@index([email])
 }
@@ -150,8 +152,9 @@ model Pack {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  wallpapers WallpaperOnPack[]
-  purchases  PackPurchase[]
+  wallpapers    WallpaperOnPack[]
+  purchases     PackPurchase[]
+  packCartItems PackCartItem[]
 
   @@index([published])
 }
@@ -219,5 +222,26 @@ model Wishlist {
   wallpaper Wallpaper @relation(fields: [wallpaperId], references: [id], onDelete: Cascade)
 
   @@unique([userId, wallpaperId])
+  @@index([userId])
+}
+
+model SubscriptionCartItem {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PackCartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  packId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pack Pack @relation(fields: [packId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, packId])
   @@index([userId])
 }
