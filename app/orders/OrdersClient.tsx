@@ -40,7 +40,7 @@ interface Props {
   subscription: Subscription
 }
 
-function OrderCard({ order }: { order: Order }) {
+function OrderCard({ order, orderNumber }: { order: Order; orderNumber: number }) {
   const [expanded, setExpanded] = useState(false)
   const itemCount = order.wallpapers.length + order.packs.length
 
@@ -54,7 +54,8 @@ function OrderCard({ order }: { order: Order }) {
           </div>
           <div>
             <p className="text-sm font-medium text-[var(--text)]">
-              {itemCount} item{itemCount !== 1 ? 's' : ''}
+              Order <span className="text-[var(--accent)]">#{String(orderNumber).padStart(4, '0')}</span>
+              <span className="text-[var(--text-muted)] font-normal ml-2">· {itemCount} item{itemCount !== 1 ? 's' : ''}</span>
             </p>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">
               {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -167,8 +168,8 @@ export function OrdersClient({ orders, subscription }: Props) {
       )}
 
       {/* One-time orders */}
-      {orders.map((order) => (
-        <OrderCard key={order.paymentId} order={order} />
+      {orders.map((order, index) => (
+        <OrderCard key={order.paymentId} order={order} orderNumber={orders.length - index} />
       ))}
     </div>
   )
