@@ -23,6 +23,7 @@ export function WallpaperDetailActions({
 }: Props) {
   const [wishlisted, setWishlisted] = useState(initialWishlisted)
   const [inCart, setInCart] = useState(initialInCart)
+  const [addingToCart, setAddingToCart] = useState(false)
   const router = useRouter()
 
   useEffect(() => { setWishlisted(initialWishlisted) }, [initialWishlisted])
@@ -49,18 +50,23 @@ export function WallpaperDetailActions({
   async function addToCart() {
     if (!isAuthenticated) { toast.error('Sign in to add to cart'); return }
     if (inCart) { router.push('/cart'); return }
-    const res = await fetch('/api/cart', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wallpaperId }),
-    })
-    if (res.status === 409) { toast('Already in cart'); setInCart(true); return }
-    if (res.ok) {
-      toast.success('Added to cart')
-      setInCart(true)
-      window.dispatchEvent(new Event('cart-updated'))
-    } else {
-      toast.error('Failed to add to cart')
+    setAddingToCart(true)
+    try {
+      const res = await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallpaperId }),
+      })
+      if (res.status === 409) { toast('Already in cart'); setInCart(true); return }
+      if (res.ok) {
+        toast.success('Added to cart')
+        setInCart(true)
+        window.dispatchEvent(new Event('cart-updated'))
+      } else {
+        toast.error('Failed to add to cart')
+      }
+    } finally {
+      setAddingToCart(false)
     }
   }
 
@@ -81,14 +87,17 @@ export function WallpaperDetailActions({
       {!owned && !isFree && (
         <button
           onClick={addToCart}
-          className={`cursor-pointer flex items-center gap-2 flex-1 justify-center rounded-[4px] px-4 py-2.5 text-sm font-medium transition-colors
+          disabled={addingToCart}
+          className={`cursor-pointer flex items-center gap-2 flex-1 justify-center rounded-[4px] px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed
             ${inCart
               ? 'border border-[var(--accent)]/40 bg-[var(--accent)]/15 text-[var(--accent)]'
               : 'bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)]'
             }`}
         >
-          <ShoppingCart size={15} />
-          {inCart ? 'Go to Cart' : 'Add to Cart'}
+          {addingToCart
+            ? <><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-black border-t-transparent" />Adding…</>
+            : <><ShoppingCart size={15} />{inCart ? 'Go to Cart' : 'Add to Cart'}</>
+          }
         </button>
       )}
     </div>

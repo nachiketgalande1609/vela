@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { Suspense } from 'react'
 import { PublicNav } from '@/app/components/layout/PublicNav'
 import { OrderConfirmationContent } from './OrderConfirmationContent'
