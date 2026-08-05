@@ -35,6 +35,8 @@ model User {
   purchases     Purchase[]
   subscription  Subscription?
   packPurchases PackPurchase[]
+  cartItems     CartItem[]
+  wishlists     Wishlist[]
 
   @@index([email])
 }
@@ -100,8 +102,10 @@ model Wallpaper {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  purchases Purchase[]
-  packs     WallpaperOnPack[]
+  purchases  Purchase[]
+  packs      WallpaperOnPack[]
+  cartItems  CartItem[]
+  wishlists  Wishlist[]
 
   @@index([category])
   @@index([published])
@@ -179,6 +183,19 @@ model PackPurchase {
   @@index([userId])
 }
 
+model CartItem {
+  id          String   @id @default(cuid())
+  userId      String
+  wallpaperId String
+  createdAt   DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wallpaper Wallpaper @relation(fields: [wallpaperId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wallpaperId])
+  @@index([userId])
+}
+
 model DownloadNonce {
   id          String   @id @default(cuid())
   nonce       String   @unique
@@ -190,4 +207,17 @@ model DownloadNonce {
 
   @@index([nonce])
   @@index([expiresAt])
+}
+
+model Wishlist {
+  id          String   @id @default(cuid())
+  userId      String
+  wallpaperId String
+  createdAt   DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wallpaper Wallpaper @relation(fields: [wallpaperId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wallpaperId])
+  @@index([userId])
 }

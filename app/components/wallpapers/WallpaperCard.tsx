@@ -2,6 +2,8 @@
 import Link from 'next/link'
 import { PreviewImage } from './PreviewImage'
 import { useNavigationLoading } from '@/app/components/providers/NavigationLoadingProvider'
+import { WishlistButton } from './WishlistButton'
+import { AddToCartButton } from '@/app/components/cart/AddToCartButton'
 
 export interface WallpaperCardData {
   id: string
@@ -16,9 +18,10 @@ interface WallpaperCardProps {
   wallpaper: WallpaperCardData
   isAuthenticated: boolean
   owned?: boolean
+  wishlisted?: boolean
 }
 
-export function WallpaperCard({ wallpaper, owned = false }: WallpaperCardProps) {
+export function WallpaperCard({ wallpaper, isAuthenticated, owned = false, wishlisted }: WallpaperCardProps) {
   const { startLoading } = useNavigationLoading()
 
   return (
@@ -45,6 +48,20 @@ export function WallpaperCard({ wallpaper, owned = false }: WallpaperCardProps) 
               <path d="M12 2L9 8 3 6l3 7H18l3-7-6 2-3-6zM5 15v2h14v-2H5z"/>
             </svg>
           ) : null}
+        </div>
+
+        <div className="absolute bottom-2 left-2 flex gap-1.5" onClick={(e) => e.preventDefault()}>
+          <WishlistButton
+            wallpaperId={wallpaper.id}
+            initialWishlisted={wishlisted}
+            isAuthenticated={isAuthenticated}
+          />
+          <AddToCartButton
+            wallpaperId={wallpaper.id}
+            isAuthenticated={isAuthenticated}
+            owned={owned}
+            isFree={wallpaper.isFree}
+          />
         </div>
       </div>
     </Link>

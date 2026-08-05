@@ -1,9 +1,11 @@
 import Link from 'next/link'
+import { Search } from 'lucide-react'
 import { verifySession, getUser } from '@/lib/auth/dal'
 import { siteConfig } from '@/config/site'
 import { NavDropdown } from './NavDropdown'
 import { GenreDropdown } from './GenreDropdown'
 import { NavSpacer } from './NavSpacer'
+import { CartIcon } from './CartIcon'
 
 export async function PublicNav() {
   const session = await verifySession()
@@ -28,6 +30,10 @@ export async function PublicNav() {
             <Link href="/wallpapers/free" className="hidden sm:block text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
               Free
             </Link>
+            <Link href="/search" aria-label="Search" className="text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+              <Search size={18} />
+            </Link>
+            <CartIcon />
             {user ? (
               <NavDropdown name={user.name ?? user.email} role={user.role as 'ADMIN' | 'USER'} />
             ) : (
