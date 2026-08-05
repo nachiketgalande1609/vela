@@ -2,8 +2,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import toast from 'react-hot-toast'
-import { Trash2, Package, Loader2 } from 'lucide-react'
+import { Trash2, Package, Loader2, Pencil } from 'lucide-react'
 
 interface Pack {
   id: string
@@ -100,6 +101,12 @@ export function AdminPacksClient({ packs: initial }: { packs: Pack[] }) {
               <td className="px-4 py-3 text-[var(--text-muted)]">{pack._count.purchases}</td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2 justify-end">
+                  <Link
+                    href={`/admin/packs/${pack.id}/edit`}
+                    className="inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1.5 text-[10px] font-medium uppercase tracking-wide border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] hover:border-[var(--text-muted)]/40 transition-colors"
+                  >
+                    <Pencil className="h-3 w-3" /> Edit
+                  </Link>
                   <button
                     onClick={() => togglePublish(pack)}
                     disabled={publishingId === pack.id || deletingId === pack.id}
