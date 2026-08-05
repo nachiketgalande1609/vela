@@ -74,8 +74,10 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
 
   const billableItems = items.filter((i) => !ownedIds.includes(i.wallpaperId))
   const billablePackItems = packItems.filter((i) => !ownedPackIds.includes(i.packId))
-  const wallpaperPackTotal = billableItems.reduce((sum, i) => sum + i.wallpaper.price, 0)
-    + billablePackItems.reduce((sum, i) => sum + i.pack.price, 0)
+  // If Vela+ is in cart, wallpapers/packs are covered — don't add their price
+  const wallpaperPackTotal = subInCart ? 0
+    : billableItems.reduce((sum, i) => sum + i.wallpaper.price, 0)
+      + billablePackItems.reduce((sum, i) => sum + i.pack.price, 0)
   const subtotal = wallpaperPackTotal + (subInCart ? 499 : 0)
   const totalCount = billableItems.length + billablePackItems.length + (subInCart ? 1 : 0)
 
@@ -110,6 +112,8 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
             if (vRes.ok) {
               toast.success('Vela+ activated!')
               setSubInCart(false)
+              setItems([])
+              setPackItems([])
               window.dispatchEvent(new Event('cart-updated'))
               router.push('/dashboard')
             } else {
@@ -175,15 +179,19 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
           {/* Wallpapers */}
           {items.map((item) => {
             const owned = ownedIds.includes(item.wallpaperId)
+            const coveredBySub = subInCart && !owned
             return (
-              <div key={item.id} className="flex items-center gap-4 rounded-[4px] border border-[var(--border)] bg-[var(--card)] p-3">
+              <div key={item.id} className={`flex items-center gap-4 rounded-[4px] border bg-[var(--card)] p-3 ${coveredBySub ? 'border-[var(--border)] opacity-60' : 'border-[var(--border)]'}`}>
                 <div className="relative h-20 w-[45px] flex-shrink-0 overflow-hidden rounded-[4px]">
                   <Image src={item.wallpaper.thumbPath} alt={item.wallpaper.title} fill className="object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="truncate text-sm font-medium text-[var(--text)]">{item.wallpaper.title}</p>
                   <p className="text-xs text-[var(--text-muted)]">{item.wallpaper.category}</p>
-                  <p className="mt-1 text-sm font-semibold text-[var(--accent)]">₹{item.wallpaper.price.toFixed(0)}</p>
+                  {coveredBySub
+                    ? <p className="mt-1 text-xs text-[var(--accent)]">Included with Vela+</p>
+                    : <p className="mt-1 text-sm font-semibold text-[var(--accent)]">₹{item.wallpaper.price.toFixed(0)}</p>
+                  }
                 </div>
                 {owned && (
                   <span className="rounded-[4px] bg-green-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase text-green-400">Owned</span>
@@ -226,9 +234,10 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
           {/* Packs */}
           {packItems.map((item) => {
             const owned = ownedPackIds.includes(item.packId)
+            const coveredBySub = subInCart && !owned
             const thumb = item.pack.wallpapers[0]?.wallpaper.thumbPath
             return (
-              <div key={item.id} className="flex items-center gap-4 rounded-[4px] border border-[var(--border)] bg-[var(--card)] p-3">
+              <div key={item.id} className={`flex items-center gap-4 rounded-[4px] border bg-[var(--card)] p-3 ${coveredBySub ? 'border-[var(--border)] opacity-60' : 'border-[var(--border)]'}`}>
                 <div className="relative h-20 w-[45px] flex-shrink-0 overflow-hidden rounded-[4px]">
                   {thumb ? (
                     <Image src={thumb} alt={item.pack.title} fill className="object-cover" />
@@ -239,7 +248,10 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
                 <div className="flex-1 min-w-0">
                   <p className="truncate text-sm font-medium text-[var(--text)]">{item.pack.title}</p>
                   <p className="text-xs text-[var(--text-muted)]">{item.pack._count.wallpapers} wallpapers · Pack</p>
-                  <p className="mt-1 text-sm font-semibold text-[var(--accent)]">₹{item.pack.price.toFixed(0)}</p>
+                  {coveredBySub
+                    ? <p className="mt-1 text-xs text-[var(--accent)]">Included with Vela+</p>
+                    : <p className="mt-1 text-sm font-semibold text-[var(--accent)]">₹{item.pack.price.toFixed(0)}</p>
+                  }
                 </div>
                 {owned && (
                   <span className="rounded-[4px] bg-green-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase text-green-400">Owned</span>
@@ -259,6 +271,11 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
         {/* Order summary */}
         <div className="lg:col-span-1 rounded-[4px] border border-[var(--border)] bg-[var(--card)] p-5 space-y-4 lg:sticky lg:top-24">
           <h2 className="text-base font-semibold text-[var(--text)]">Order Summary</h2>
+          {subInCart && (items.length > 0 || packItems.length > 0) && (
+            <p className="text-[10px] text-[var(--accent)] bg-[var(--accent)]/10 rounded-[4px] px-2 py-1.5">
+              Vela+ includes all wallpapers & packs — individual items are covered.
+            </p>
+          )}
           <div className="flex justify-between text-sm text-[var(--text-muted)]">
             <span>Items ({totalCount})</span>
             <span>₹{subtotal.toFixed(0)}</span>

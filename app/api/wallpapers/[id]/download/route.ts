@@ -17,6 +17,29 @@ export async function POST(
     return NextResponse.json({ error: 'Purchase or subscribe to download.' }, { status: 403 })
   }
 
+  // Download-to-own: record a permanent ₹0 purchase for subscribed users
+  // so they retain access after their subscription expires
+  if (userId) {
+    const wallpaper = await prisma.wallpaper.findUnique({ where: { id }, select: { isFree: true } })
+    if (!wallpaper?.isFree) {
+      const alreadyOwned = await prisma.purchase.findUnique({
+        where: { userId_wallpaperId: { userId, wallpaperId: id } },
+      })
+      if (!alreadyOwned) {
+        try {
+          await prisma.purchase.create({
+            data: {
+              userId,
+              wallpaperId: id,
+              paymentId: `sub_download_${userId}_${id}_${Date.now()}`,
+              amount: 0,
+            },
+          })
+        } catch { /* ignore duplicate race */ }
+      }
+    }
+  }
+
   const nonce = crypto.randomUUID()
   const expiresAt = new Date(Date.now() + 60 * 1000)
 
