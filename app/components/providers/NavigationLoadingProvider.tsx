@@ -16,9 +16,12 @@ export function NavigationLoadingProvider({ children }: { children: React.ReactN
     <Ctx.Provider value={{ startLoading: () => setLoading(true) }}>
       {children}
       {loading && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--bg)]/70 backdrop-blur-sm">
-          <div className="h-9 w-9 rounded-full border-2 border-[var(--accent)] border-t-transparent animate-spin" />
-        </div>
+        <>
+          <div className="fixed inset-0 z-[100] bg-[var(--bg)]/70 backdrop-blur-sm" style={{ WebkitBackdropFilter: 'blur(4px)' }} />
+          <div className="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none">
+            <div className="h-9 w-9 rounded-full border-2 border-[var(--accent)] border-t-transparent animate-spin" style={{ willChange: 'transform' }} />
+          </div>
+        </>
       )}
     </Ctx.Provider>
   )
