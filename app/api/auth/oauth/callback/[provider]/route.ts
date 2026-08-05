@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/db/prisma'
 import { parseOAuthState, exchangeGoogleCode } from '@/lib/auth/oauth'
 import { createSession } from '@/lib/db/sessions'
@@ -91,6 +92,7 @@ export async function GET(
     await prisma.session.update({ where: { id: session.id }, data: { refreshToken } })
     await setAuthCookies(accessToken, refreshToken, false)
 
+    revalidatePath('/', 'layout')
     const res = NextResponse.redirect(`${env.APP_URL}/`)
     res.cookies.delete('oauth_state')
     return res
