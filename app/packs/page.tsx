@@ -9,7 +9,8 @@ import { Package } from 'lucide-react'
 export const metadata = { title: 'Wallpaper Packs' }
 
 export default async function PacksPage() {
-  let packs: Awaited<ReturnType<typeof prisma.pack.findMany>> = []
+  type PackItem = { id: string; title: string; description: string | null; price: number; _count: { wallpapers: number }; wallpapers: { wallpaper: { thumbPath: string; title: string } }[] }
+  let packs: PackItem[] = []
   try {
     packs = await prisma.pack.findMany({
       where: { published: true },
