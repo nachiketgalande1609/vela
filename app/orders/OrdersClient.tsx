@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { FileText, ChevronDown, ChevronUp, Download, Package, Image as ImageIcon, Infinity } from 'lucide-react'
+import Image from 'next/image'
+import { FileText, ChevronDown, ChevronUp, Download, Package, Infinity } from 'lucide-react'
 
 type WallpaperItem = {
   id: string
@@ -94,8 +95,8 @@ function OrderCard({ order }: { order: Order }) {
               href={`/wallpapers/${item.wallpaper.id}`}
               className="flex items-center gap-3 px-5 py-3 hover:bg-[var(--surface-2)] transition-colors"
             >
-              <div className="flex h-7 w-7 items-center justify-center rounded bg-[var(--surface-2)] flex-shrink-0">
-                <ImageIcon className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+              <div className="relative h-10 w-8 flex-shrink-0 overflow-hidden rounded">
+                <Image src={item.wallpaper.thumbPath} alt={item.wallpaper.title} fill className="object-cover" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-[var(--text)] truncate">{item.wallpaper.title}</p>
