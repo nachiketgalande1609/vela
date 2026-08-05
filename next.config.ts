@@ -14,7 +14,7 @@ const ContentSecurityPolicy = `
 `.replace(/\s{2,}/g, ' ').trim()
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['*'],
+  allowedDevOrigins: ['192.168.31.10'],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'localhost' },

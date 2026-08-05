@@ -17,7 +17,7 @@ export function GenreDropdown() {
   }, [])
 
   return (
-    <div ref={ref} className="relative hidden sm:block">
+    <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-1 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
@@ -27,7 +27,7 @@ export function GenreDropdown() {
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full mt-2 z-50 w-48 rounded-[4px] border border-[var(--border)] bg-[var(--surface)] shadow-xl py-1">
+        <div className="absolute left-0 top-full mt-2 z-50 w-48 rounded-[4px] border border-[var(--border)] bg-[var(--surface)] shadow-xl py-1 max-h-[60vh] overflow-y-auto">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat}
