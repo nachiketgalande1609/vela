@@ -46,7 +46,7 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-[var(--bg)]">
       <PublicNav />
 
-      <div className="mx-auto max-w-7xl px-6 py-8 space-y-8">
+      <div className="mx-auto max-w-7xl px-3 pt-4 pb-6 sm:px-6 sm:py-8 space-y-8">
 
         <PageHeader
           title="My Library"

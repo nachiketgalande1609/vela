@@ -117,7 +117,7 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
         <PurchaseSuccessBanner />
       </Suspense>
 
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-3 pt-4 pb-6 sm:px-6 sm:py-8">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
           {/* Preview */}
           <div className="flex justify-center">
@@ -251,7 +251,7 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
         </div>
 
         {related.length > 0 && (
-          <div className="mt-16 border-t border-[var(--border)] pt-12">
+          <div className="mt-8 border-t border-[var(--border)] pt-6 sm:mt-16 sm:pt-12">
             <h2 className="mb-6 text-xl font-bold text-[var(--text)]" style={{ fontFamily: 'var(--font-playfair)' }}>
               More like this
             </h2>

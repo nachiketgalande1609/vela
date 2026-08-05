@@ -65,7 +65,7 @@ export default async function PackDetailPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-[var(--bg)]">
       <PublicNav />
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-3 pt-4 pb-6 sm:px-6 sm:py-8">
         <PageHeader
           title={pack.title}
           breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Packs', href: '/packs' }, { label: pack.title }]}
