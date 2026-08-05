@@ -16,5 +16,5 @@ export function NavSpacer() {
     return () => window.removeEventListener('resize', update)
   }, [])
 
-  return <div ref={ref} aria-hidden />
+  return <div ref={ref} aria-hidden suppressHydrationWarning />
 }
