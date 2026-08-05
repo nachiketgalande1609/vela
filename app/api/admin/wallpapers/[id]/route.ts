@@ -11,6 +11,7 @@ export async function PATCH(
   const { id } = await params
   const body = await req.json() as {
     published?: boolean
+    isFree?: boolean
     title?: string
     price?: number
     category?: string

@@ -8,7 +8,7 @@ import { downloadFromS3 } from '@/lib/storage/s3'
 export async function POST(req: NextRequest) {
   await requireAdmin()
 
-  const { key, uuid, title, description, category, tags, price } = await req.json() as {
+  const { key, uuid, title, description, category, tags, price, isFree } = await req.json() as {
     key: string
     uuid: string
     title: string
@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
     category: string
     tags: string
     price: number
+    isFree?: boolean
   }
 
   if (!key || !uuid || !title || !category || isNaN(price)) {
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
         category,
         tags,
         price,
+        isFree: isFree ?? false,
         storagePath: key,
         previewPath,
         thumbPath,

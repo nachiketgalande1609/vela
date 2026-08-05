@@ -1,6 +1,10 @@
 import { prisma } from '@/lib/db/prisma'
 
-export async function canDownload(userId: string, wallpaperId: string): Promise<boolean> {
+export async function canDownload(userId: string | null, wallpaperId: string): Promise<boolean> {
+  const wallpaper = await prisma.wallpaper.findUnique({ where: { id: wallpaperId }, select: { isFree: true } })
+  if (wallpaper?.isFree) return true
+  if (!userId) return false
+
   const [user, purchase, subscription, packPurchase] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, select: { role: true } }),
     prisma.purchase.findUnique({

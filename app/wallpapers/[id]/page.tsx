@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function WallpaperDetailPage({ params }: PageProps) {
   const { id } = await params
 
-  type WallpaperData = { id: string; title: string; description: string | null; price: number; category: string; tags: string; previewPath: string; thumbPath: string; width: number; height: number; storagePath: string }
+  type WallpaperData = { id: string; title: string; description: string | null; price: number; category: string; tags: string; previewPath: string; thumbPath: string; width: number; height: number; storagePath: string; isFree: boolean }
   let wallpaper: WallpaperData | null = null
   let session: Awaited<ReturnType<typeof verifySession>> = null
 
@@ -46,7 +46,7 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
         select: {
           id: true, title: true, description: true, price: true,
           category: true, tags: true, previewPath: true, thumbPath: true,
-          width: true, height: true, storagePath: true,
+          width: true, height: true, storagePath: true, isFree: true,
         },
       }),
       verifySession(),
@@ -57,7 +57,7 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
 
   if (!wallpaper) notFound()
 
-  let canAccess = false
+  let canAccess = wallpaper.isFree
   let ownedIds: string[] = []
   let hasSubscription = false
   let ownedPackIds: string[] = []
@@ -104,7 +104,7 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
       where: { published: true, category: wallpaper.category, id: { not: id } },
       take: 4,
       orderBy: { createdAt: 'desc' },
-      select: { id: true, title: true, price: true, category: true, thumbPath: true },
+      select: { id: true, title: true, price: true, category: true, thumbPath: true, isFree: true },
     })
   } catch { /* empty related on DB unavailable */ }
 
@@ -176,7 +176,12 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
             )}
 
             <div className="border-t border-[var(--border)] pt-6">
-              {canAccess ? (
+              {wallpaper.isFree ? (
+                <div className="flex flex-col gap-3">
+                  <p className="text-xs text-emerald-400">Free wallpaper — no purchase needed</p>
+                  <DownloadButton wallpaperId={id} className="w-full justify-center" />
+                </div>
+              ) : canAccess ? (
                 <div className="flex flex-col gap-3">
                   <p className="text-xs text-[var(--accent)]">You have access to this wallpaper</p>
                   <DownloadButton wallpaperId={id} className="w-full justify-center" />

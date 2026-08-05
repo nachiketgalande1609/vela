@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
   const category = formData.get('category') as string
   const tags = formData.get('tags') as string
   const price = parseFloat(formData.get('price') as string)
+  const isFree = formData.get('isFree') === 'true'
 
   if (!file || !title || !category || isNaN(price)) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -59,6 +60,7 @@ export async function POST(req: NextRequest) {
         category,
         tags,
         price,
+        isFree,
         storagePath: storageKey,
         previewPath,
         thumbPath,

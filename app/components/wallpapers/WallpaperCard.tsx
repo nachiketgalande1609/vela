@@ -9,6 +9,7 @@ export interface WallpaperCardData {
   price: number
   category: string
   thumbPath: string
+  isFree?: boolean
 }
 
 interface WallpaperCardProps {
@@ -34,16 +35,16 @@ export function WallpaperCard({ wallpaper, owned = false }: WallpaperCardProps) 
           />
         </div>
 
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-3 right-3">
           {owned ? (
             <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-1.5 py-0.5 rounded-[4px]">
               Owned
             </span>
-          ) : (
-            <span className="bg-[var(--accent)] text-black text-[10px] font-bold px-1.5 py-0.5 rounded-[4px]">
-              ₹{wallpaper.price.toFixed(0)}
-            </span>
-          )}
+          ) : !wallpaper.isFree ? (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="var(--accent)" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L9 8 3 6l3 7H18l3-7-6 2-3-6zM5 15v2h14v-2H5z"/>
+            </svg>
+          ) : null}
         </div>
       </div>
     </Link>

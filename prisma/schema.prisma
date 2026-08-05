@@ -96,6 +96,7 @@ model Wallpaper {
   previewPath String
   thumbPath   String
   published   Boolean  @default(false)
+  isFree      Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

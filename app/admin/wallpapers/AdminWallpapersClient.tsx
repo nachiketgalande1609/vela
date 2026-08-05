@@ -9,6 +9,7 @@ interface WallpaperRow {
   id: string
   title: string
   price: number
+  isFree: boolean
   category: string
   published: boolean
   thumbPath: string
@@ -99,7 +100,7 @@ function PriceDialog({ count, onConfirm, onClose }: { count: number; onConfirm: 
 export function AdminWallpapersClient({ initial, allPacks }: { initial: WallpaperRow[]; allPacks: PackOption[] }) {
   const [wallpapers, setWallpapers] = useState<WallpaperRow[]>(initial)
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [editForms, setEditForms] = useState<Record<string, { title: string; price: string; category: string; tags: string; description: string }>>({})
+  const [editForms, setEditForms] = useState<Record<string, { title: string; price: string; isFree: boolean; category: string; tags: string; description: string }>>({})
   const [saving, setSaving] = useState<string | null>(null)
 
   // filters
@@ -200,7 +201,7 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
   const toggleExpand = (w: WallpaperRow) => {
     if (expandedId === w.id) { setExpandedId(null); return }
     setExpandedId(w.id)
-    setEditForms((p) => ({ ...p, [w.id]: { title: w.title, price: String(w.price), category: w.category, tags: '', description: '' } }))
+    setEditForms((p) => ({ ...p, [w.id]: { title: w.title, price: String(w.price), isFree: w.isFree, category: w.category, tags: '', description: '' } }))
   }
 
   const saveEdit = async (id: string) => {
@@ -211,10 +212,10 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
       const res = await fetch(`/api/admin/wallpapers/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: f.title, price: parseFloat(f.price), category: f.category, tags: f.tags, description: f.description }),
+        body: JSON.stringify({ title: f.title, price: parseFloat(f.price), isFree: f.isFree ?? false, category: f.category, tags: f.tags, description: f.description }),
       })
       if (!res.ok) { toast.error('Save failed'); return }
-      setWallpapers((p) => p.map((w) => w.id === id ? { ...w, title: f.title, price: parseFloat(f.price), category: f.category } : w))
+      setWallpapers((p) => p.map((w) => w.id === id ? { ...w, title: f.title, price: parseFloat(f.price), isFree: f.isFree ?? false, category: f.category } : w))
       setExpandedId(null)
       toast.success('Saved')
     } finally { setSaving(null) }
@@ -386,7 +387,11 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-center text-[var(--text)]">₹{w.price.toFixed(0)}</td>
+                    <td className="px-4 py-3 text-center text-[var(--text)]">
+                      {w.isFree ? (
+                        <span className="rounded-[4px] px-2 py-0.5 text-[10px] font-medium bg-emerald-500/15 text-emerald-400">Free</span>
+                      ) : `₹${w.price.toFixed(0)}`}
+                    </td>
                     <td className="px-4 py-3 text-center">
                       <span className={`rounded-[4px] px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide ${w.published ? 'bg-emerald-500/15 text-emerald-400' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}>
                         {w.published ? 'Published' : 'Draft'}
@@ -426,6 +431,12 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
                             <input type="number" step="0.01" min="0" value={editForms[w.id].price}
                               onChange={(e) => setEditForms((p) => ({ ...p, [w.id]: { ...p[w.id], price: e.target.value } }))}
                               className={inputClass} />
+                            <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+                              <input type="checkbox" checked={editForms[w.id].isFree ?? false}
+                                onChange={(e) => setEditForms((p) => ({ ...p, [w.id]: { ...p[w.id], isFree: e.target.checked } }))}
+                                className="h-3.5 w-3.5 rounded-[2px] accent-[var(--accent)]" />
+                              <span className="text-[10px] uppercase tracking-widest text-[var(--text-muted)]">Free download</span>
+                            </label>
                           </div>
                           <div className="space-y-1">
                             <label className="text-[10px] uppercase tracking-widest text-[var(--text-muted)]">Category</label>

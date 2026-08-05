@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
         take: limit,
         select: {
           id: true, title: true, price: true, category: true,
-          thumbPath: true, tags: true,
+          thumbPath: true, tags: true, isFree: true,
         },
       }),
       prisma.wallpaper.count({ where }),

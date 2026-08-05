@@ -36,7 +36,7 @@ export function UploadClient() {
   const [dragOver, setDragOver] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
-  const [form, setForm] = useState({ title: '', description: '', category: 'Abstract', tags: '', price: '99' })
+  const [form, setForm] = useState({ title: '', description: '', category: 'Abstract', tags: '', price: '99', isFree: false })
   const fileRef = useRef<HTMLInputElement>(null)
 
   const pickFile = (f: File) => {
@@ -74,14 +74,14 @@ export function UploadClient() {
       const confirmRes = await fetch('/api/admin/wallpapers/confirm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key, uuid, title: form.title, description: form.description, category: form.category, tags: form.tags, price: parseFloat(form.price) }),
+        body: JSON.stringify({ key, uuid, title: form.title, description: form.description, category: form.category, tags: form.tags, price: parseFloat(form.price), isFree: form.isFree }),
       })
       const data = await confirmRes.json() as { wallpaper?: unknown; error?: string }
       if (!confirmRes.ok || !data.wallpaper) { toast.error(data.error ?? 'Processing failed'); return }
 
       toast.success('Uploaded — previews generated')
       setFile(null); setPreview(null)
-      setForm({ title: '', description: '', category: 'Abstract', tags: '', price: '99' })
+      setForm({ title: '', description: '', category: 'Abstract', tags: '', price: '99', isFree: false })
       router.push('/admin/wallpapers')
     } finally { setUploading(false) }
   }
@@ -225,7 +225,12 @@ export function UploadClient() {
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] uppercase tracking-widest text-[var(--text-muted)]">Price (INR ₹)</label>
-                  <input type="number" step="0.01" min="0.99" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required className={inputClass} />
+                  <input type="number" step="0.01" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required className={inputClass} />
+                  <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+                    <input type="checkbox" checked={form.isFree} onChange={(e) => setForm({ ...form, isFree: e.target.checked })}
+                      className="h-3.5 w-3.5 rounded-[2px] accent-[var(--accent)]" />
+                    <span className="text-[10px] uppercase tracking-widest text-[var(--text-muted)]">Free download</span>
+                  </label>
                 </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">

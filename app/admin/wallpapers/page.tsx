@@ -13,7 +13,7 @@ export default async function AdminWallpapersPage() {
       orderBy: { createdAt: 'desc' },
       select: {
         id: true, title: true, price: true, category: true,
-        published: true, thumbPath: true, createdAt: true,
+        published: true, thumbPath: true, createdAt: true, isFree: true,
         packs: { select: { pack: { select: { id: true, title: true } } } },
       },
     }),
