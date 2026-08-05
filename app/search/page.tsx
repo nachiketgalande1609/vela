@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { PublicNav } from '@/app/components/layout/PublicNav'
 import { SearchClient } from './SearchClient'
 

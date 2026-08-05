@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { redirect } from 'next/navigation'
 import { requireAuth, getUser } from '@/lib/auth/dal'
 import { PageHeader } from '@/app/components/layout/PageHeader'

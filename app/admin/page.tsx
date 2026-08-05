@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { requireAdmin } from '@/lib/auth/dal'
 import { PublicNav } from '@/app/components/layout/PublicNav'
 import { PageHeader } from '@/app/components/layout/PageHeader'

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { notFound } from 'next/navigation'
 import { verifySession } from '@/lib/auth/dal'
 import { CATEGORIES } from '@/lib/categories'
