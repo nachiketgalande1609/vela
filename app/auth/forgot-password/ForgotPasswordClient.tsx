@@ -54,7 +54,7 @@ export default function ForgotPasswordPage() {
     <AuthCard title="Reset password" subtitle="Enter your email and we'll send a reset link if an account exists.">
       <form action={action} className="space-y-5">
         <div className="space-y-1.5">
-          <label htmlFor="email" className="block text-xs font-medium uppercase tracking-widest text-[var(--text-muted)]">
+          <label htmlFor="email" className="block text-sm font-medium text-[var(--text-muted)]">
             Email
           </label>
           <input id="email" name="email" type="email" autoComplete="email" required

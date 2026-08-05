@@ -59,7 +59,7 @@ function ResetPasswordForm() {
   return (
     <form action={action} className="space-y-5">
       <div className="space-y-1.5">
-        <label htmlFor="password" className="block text-xs font-medium uppercase tracking-widest text-[var(--text-muted)]">
+        <label htmlFor="password" className="block text-sm font-medium text-[var(--text-muted)]">
           New password
         </label>
         <div className="relative">
@@ -79,7 +79,7 @@ function ResetPasswordForm() {
       </div>
 
       <div className="space-y-1.5">
-        <label htmlFor="confirmPassword" className="block text-xs font-medium uppercase tracking-widest text-[var(--text-muted)]">
+        <label htmlFor="confirmPassword" className="block text-sm font-medium text-[var(--text-muted)]">
           Confirm password
         </label>
         <input id="confirmPassword" name="confirmPassword"
