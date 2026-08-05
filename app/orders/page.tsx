@@ -9,9 +9,9 @@ export const metadata = { title: 'My Orders — Vela' }
 export default async function OrdersPage() {
   const session = await requireAuth()
 
-  const [purchases, packPurchases, subscription] = await Promise.all([
+  const [allPurchases, packPurchases, subscription] = await Promise.all([
     prisma.purchase.findMany({
-      where: { userId: session.id, NOT: { paymentId: { startsWith: 'sub_download_' } } },
+      where: { userId: session.id },
       include: { wallpaper: { select: { id: true, title: true, thumbPath: true, category: true, price: true } } },
       orderBy: { createdAt: 'desc' },
     }),
@@ -34,6 +34,8 @@ export default async function OrdersPage() {
     packs: typeof packPurchases
     total: number
   }>()
+
+  const purchases = allPurchases.filter((p) => !p.paymentId.startsWith('sub_download_'))
 
   for (const p of purchases) {
     const baseId = p.paymentId.includes('_w_') ? p.paymentId.split('_w_')[0] : p.paymentId
