@@ -8,21 +8,32 @@ export const metadata = { title: 'Manage Wallpapers — Vela' }
 export default async function AdminWallpapersPage() {
   await requireAdmin()
 
-  const wallpapers = await prisma.wallpaper.findMany({
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id: true, title: true, price: true, category: true,
-      published: true, thumbPath: true, createdAt: true,
-    },
-  })
+  const [wallpapers, allPacks] = await Promise.all([
+    prisma.wallpaper.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true, title: true, price: true, category: true,
+        published: true, thumbPath: true, createdAt: true,
+        packs: { select: { pack: { select: { id: true, title: true } } } },
+      },
+    }),
+    prisma.pack.findMany({
+      orderBy: { title: 'asc' },
+      select: { id: true, title: true },
+    }),
+  ])
 
-  const rows = wallpapers.map((w) => ({ ...w, createdAt: w.createdAt.toISOString() }))
+  const rows = wallpapers.map((w) => ({
+    ...w,
+    createdAt: w.createdAt.toISOString(),
+    packs: w.packs.map((p) => p.pack),
+  }))
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
       <PublicNav />
       <div className="mx-auto max-w-7xl px-6 py-8">
-        <AdminWallpapersClient initial={rows} />
+        <AdminWallpapersClient initial={rows} allPacks={allPacks} />
       </div>
     </div>
   )

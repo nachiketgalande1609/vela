@@ -3,7 +3,7 @@ import { useState, useRef, Fragment, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import { Trash2, Plus, ChevronDown, ChevronUp, Trash, Check, Loader2, IndianRupee, ChevronRight } from 'lucide-react'
+import { Trash2, Plus, ChevronDown, ChevronUp, Trash, Check, Loader2, IndianRupee, ChevronRight, Search, X } from 'lucide-react'
 
 interface WallpaperRow {
   id: string
@@ -13,7 +13,10 @@ interface WallpaperRow {
   published: boolean
   thumbPath: string
   createdAt: string
+  packs: { id: string; title: string }[]
 }
+
+interface PackOption { id: string; title: string }
 
 import { CATEGORIES as BASE_CATEGORIES } from '@/lib/categories'
 const CATEGORIES = [...BASE_CATEGORIES, 'Uncategorised']
@@ -93,15 +96,33 @@ function PriceDialog({ count, onConfirm, onClose }: { count: number; onConfirm: 
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export function AdminWallpapersClient({ initial }: { initial: WallpaperRow[] }) {
+export function AdminWallpapersClient({ initial, allPacks }: { initial: WallpaperRow[]; allPacks: PackOption[] }) {
   const [wallpapers, setWallpapers] = useState<WallpaperRow[]>(initial)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [editForms, setEditForms] = useState<Record<string, { title: string; price: string; category: string; tags: string; description: string }>>({})
   const [saving, setSaving] = useState<string | null>(null)
 
-  // selection
+  // filters
+  const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [packFilter, setPackFilter] = useState('all')
+
+  const filteredWallpapers = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return wallpapers.filter((w) => {
+      if (q && !w.title.toLowerCase().includes(q)) return false
+      if (categoryFilter !== 'all' && w.category !== categoryFilter) return false
+      if (packFilter === 'none' && w.packs.length > 0) return false
+      if (packFilter !== 'all' && packFilter !== 'none' && !w.packs.some((p) => p.id === packFilter)) return false
+      return true
+    })
+  }, [wallpapers, search, categoryFilter, packFilter])
+
+  const filtersActive = search !== '' || categoryFilter !== 'all' || packFilter !== 'all'
+
+  // selection (operates on filtered rows so "select all" only selects visible)
   const [selected, setSelected] = useState<Set<string>>(new Set())
-  const allIds = useMemo(() => wallpapers.map((w) => w.id), [wallpapers])
+  const allIds = useMemo(() => filteredWallpapers.map((w) => w.id), [filteredWallpapers])
   const allSelected = allIds.length > 0 && allIds.every((id) => selected.has(id))
   const someSelected = selected.size > 0
 
@@ -269,10 +290,54 @@ export function AdminWallpapersClient({ initial }: { initial: WallpaperRow[] }) 
         </div>
       </div>
 
+      {/* Filter bar */}
+      <div className="flex flex-wrap gap-2 items-center">
+        <div className="relative flex-1 min-w-[180px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)] pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search title…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-[4px] border border-[var(--border)] bg-[var(--surface)] pl-8 pr-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)] transition-colors"
+          />
+        </div>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="rounded-[4px] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition-colors"
+        >
+          <option value="all">All categories</option>
+          {CATEGORIES.map((c) => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
+        </select>
+        <select
+          value={packFilter}
+          onChange={(e) => setPackFilter(e.target.value)}
+          className="rounded-[4px] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition-colors"
+        >
+          <option value="all">All packs</option>
+          <option value="none">No pack</option>
+          {allPacks.map((p) => <option key={p.id} value={p.id} className="bg-[#111]">{p.title}</option>)}
+        </select>
+        {filtersActive && (
+          <button
+            onClick={() => { setSearch(''); setCategoryFilter('all'); setPackFilter('all') }}
+            className="flex items-center gap-1.5 rounded-[4px] border border-[var(--border)] px-3 py-2 text-xs text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+          >
+            <X className="h-3.5 w-3.5" /> Clear
+          </button>
+        )}
+        <span className="text-xs text-[var(--text-muted)] ml-auto">
+          {filteredWallpapers.length} of {wallpapers.length}
+        </span>
+      </div>
+
       {/* Table */}
       <div className="rounded-[4px] border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
-        {wallpapers.length === 0 ? (
-          <p className="p-12 text-center text-sm text-[var(--text-muted)]">No wallpapers yet. <Link href="/admin/wallpapers/upload" className="text-[var(--accent)] hover:underline">Upload one.</Link></p>
+        {filteredWallpapers.length === 0 ? (
+          wallpapers.length === 0
+            ? <p className="p-12 text-center text-sm text-[var(--text-muted)]">No wallpapers yet. <Link href="/admin/wallpapers/upload" className="text-[var(--accent)] hover:underline">Upload one.</Link></p>
+            : <p className="p-12 text-center text-sm text-[var(--text-muted)]">No wallpapers match the current filters.</p>
         ) : (
           <table className="w-full text-sm">
             <thead className="border-b border-[var(--border)]">
@@ -285,13 +350,14 @@ export function AdminWallpapersClient({ initial }: { initial: WallpaperRow[] }) 
                 <th className="px-4 py-3 text-center text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)]">Preview</th>
                 <th className="px-4 py-3 text-left text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)]">Title</th>
                 <th className="px-4 py-3 text-center text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)] hidden sm:table-cell">Category</th>
+                <th className="px-4 py-3 text-left text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)] hidden md:table-cell">Packs</th>
                 <th className="px-4 py-3 text-center text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)]">Price</th>
                 <th className="px-4 py-3 text-center text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)]">Status</th>
                 <th className="px-4 py-3 text-center text-[10px] font-medium uppercase tracking-widest text-[var(--text-muted)]">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {wallpapers.map((w) => (
+              {filteredWallpapers.map((w) => (
                 <Fragment key={w.id}>
                   <tr className={`border-t border-[var(--border)] transition-colors ${selected.has(w.id) ? 'bg-[var(--accent)]/5' : 'hover:bg-[var(--surface-2)]'}`}>
                     <td className="px-4 py-3">
@@ -306,6 +372,20 @@ export function AdminWallpapersClient({ initial }: { initial: WallpaperRow[] }) 
                     </td>
                     <td className="px-4 py-3 text-left font-medium text-[var(--text)] max-w-[200px] truncate">{w.title}</td>
                     <td className="px-4 py-3 text-center text-[var(--text-muted)] hidden sm:table-cell">{w.category}</td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      {w.packs.length === 0 ? (
+                        <span className="text-xs text-[var(--text-muted)]">—</span>
+                      ) : (
+                        <div className="flex flex-wrap gap-1">
+                          {w.packs.map((p) => (
+                            <Link key={p.id} href={`/packs/${p.id}`} target="_blank"
+                              className="rounded-[3px] border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-1.5 py-0.5 text-[10px] text-[var(--accent)] hover:bg-[var(--accent)]/15 transition-colors whitespace-nowrap">
+                              {p.title}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-center text-[var(--text)]">₹{w.price.toFixed(0)}</td>
                     <td className="px-4 py-3 text-center">
                       <span className={`rounded-[4px] px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide ${w.published ? 'bg-emerald-500/15 text-emerald-400' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'}`}>
@@ -333,7 +413,7 @@ export function AdminWallpapersClient({ initial }: { initial: WallpaperRow[] }) 
 
                   {expandedId === w.id && editForms[w.id] && (
                     <tr className="border-t border-[var(--accent)]/20">
-                      <td colSpan={7} className="px-4 py-5 bg-[var(--surface-2)]">
+                      <td colSpan={8} className="px-4 py-5 bg-[var(--surface-2)]">
                         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                           <div className="space-y-1">
                             <label className="text-[10px] uppercase tracking-widest text-[var(--text-muted)]">Title</label>
