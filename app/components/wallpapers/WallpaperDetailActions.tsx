@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Heart, ShoppingCart } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -22,6 +23,7 @@ export function WallpaperDetailActions({
 }: Props) {
   const [wishlisted, setWishlisted] = useState(initialWishlisted)
   const [inCart, setInCart] = useState(initialInCart)
+  const router = useRouter()
 
   useEffect(() => { setWishlisted(initialWishlisted) }, [initialWishlisted])
   useEffect(() => { setInCart(initialInCart) }, [initialInCart])
@@ -46,7 +48,7 @@ export function WallpaperDetailActions({
 
   async function addToCart() {
     if (!isAuthenticated) { toast.error('Sign in to add to cart'); return }
-    if (inCart) { toast('Already in cart'); return }
+    if (inCart) { router.push('/cart'); return }
     const res = await fetch('/api/cart', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -86,7 +88,7 @@ export function WallpaperDetailActions({
             }`}
         >
           <ShoppingCart size={15} />
-          {inCart ? 'In Cart' : 'Add to Cart'}
+          {inCart ? 'Go to Cart' : 'Add to Cart'}
         </button>
       )}
     </div>
