@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Search } from 'lucide-react'
+import { Search, Layers } from 'lucide-react'
 import { verifySession, getUser } from '@/lib/auth/dal'
 import { siteConfig } from '@/config/site'
 import { NavDropdown } from './NavDropdown'
@@ -31,7 +31,8 @@ export async function PublicNav() {
           {/* Right — nav links + cart + user */}
           <div className="flex items-center gap-5 shrink-0 ml-auto">
             <GenreDropdown />
-            <Link href="/packs" className="hidden sm:block text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+            <Link href="/packs" className="hidden sm:flex items-center gap-1 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+              <Layers className="h-3.5 w-3.5" />
               Packs
             </Link>
             {/* Mobile search icon */}

@@ -6,6 +6,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--text-muted)]">
         <p>© {new Date().getFullYear()} Vela. All rights reserved.</p>
         <div className="flex items-center gap-5">
+          <Link href="/about" className="hover:text-[var(--text)] transition-colors">About</Link>
           <Link href="/privacy" className="hover:text-[var(--text)] transition-colors">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-[var(--text)] transition-colors">Terms of Service</Link>
           <Link href="/license" className="hover:text-[var(--text)] transition-colors">Licence</Link>

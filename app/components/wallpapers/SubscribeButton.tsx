@@ -75,7 +75,7 @@ export function SubscribeButton({ isAuthenticated, className = '' }: Props) {
   if (!isAuthenticated) {
     return (
       <button onClick={() => router.push('/auth/login')}
-        className={`w-full rounded-[4px] border border-[var(--accent)]/40 bg-transparent text-[var(--accent)] font-medium text-sm px-5 py-2.5 hover:bg-[var(--accent)]/10 transition-colors ${className}`}>
+        className={`rounded-[4px] border border-[var(--accent)]/40 bg-transparent text-[var(--accent)] font-medium text-sm px-5 py-2.5 hover:bg-[var(--accent)]/10 transition-colors ${className}`}>
         Sign in to subscribe
       </button>
     )
@@ -83,7 +83,7 @@ export function SubscribeButton({ isAuthenticated, className = '' }: Props) {
 
   return (
     <button onClick={handleSubscribe} disabled={loading}
-      className={`w-full rounded-[4px] border border-[var(--accent)]/40 bg-transparent text-[var(--accent)] font-medium text-sm px-5 py-2.5 hover:bg-[var(--accent)]/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${className}`}>
+      className={`rounded-[4px] border border-[var(--accent)]/40 bg-transparent text-[var(--accent)] font-medium text-sm px-5 py-2.5 hover:bg-[var(--accent)]/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${className}`}>
       {loading ? 'Opening payment…' : 'Subscribe — ₹499 / month'}
     </button>
   )

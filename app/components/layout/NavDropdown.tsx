@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, CreditCard, LogOut, LayoutDashboard, ShieldCheck, Package, Heart } from 'lucide-react'
+import { ChevronDown, CreditCard, LogOut, LayoutDashboard, ShieldCheck, Package, Heart, BarChart2 } from 'lucide-react'
 import { getCsrfCookie } from '@/app/components/providers/CsrfProvider'
 
 interface Props {
@@ -44,13 +44,12 @@ export function NavDropdown({ name, role }: Props) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+        className="cursor-pointer flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 hover:border-[var(--text-muted)]/40 transition-colors"
       >
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent)]/20 text-[10px] font-bold text-[var(--accent)]">
           {initials}
         </span>
-        <span className="hidden sm:inline max-w-[120px] truncate">{name}</span>
-        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`h-3.5 w-3.5 text-[var(--text-muted)] transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
@@ -81,6 +80,14 @@ export function NavDropdown({ name, role }: Props) {
                 <Package className="h-4 w-4" />
                 Packs
               </Link>
+              <Link
+                href="/admin/analytics"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] transition-colors"
+              >
+                <BarChart2 className="h-4 w-4" />
+                Analytics
+              </Link>
               <div className="my-1 border-t border-[var(--border)]" />
             </>
           ) : (
@@ -106,7 +113,7 @@ export function NavDropdown({ name, role }: Props) {
           )}
           <button
             onClick={() => void logout()}
-            className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+            className="cursor-pointer flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
           >
             <LogOut className="h-4 w-4" />
             Log out
