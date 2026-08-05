@@ -29,7 +29,7 @@ export function NavDropdown({ name, role }: Props) {
       method: 'POST',
       headers: { 'x-csrf-token': getCsrfCookie() },
     })
-    router.push('/auth/login')
+    router.push('/')
     router.refresh()
   }
 

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Search, Layers } from 'lucide-react'
+import { Search, Layers, LogIn } from 'lucide-react'
 import { verifySession, getUser } from '@/lib/auth/dal'
 import { siteConfig } from '@/config/site'
 import { NavDropdown } from './NavDropdown'
@@ -43,7 +43,8 @@ export async function PublicNav() {
             {user ? (
               <NavDropdown name={user.name ?? user.email} role={user.role as 'ADMIN' | 'USER'} />
             ) : (
-              <Link href="/auth/login" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+              <Link href="/auth/login" className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+                <LogIn size={15} />
                 Sign In
               </Link>
             )}

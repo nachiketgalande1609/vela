@@ -38,7 +38,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
     try {
       await fetch('/api/auth/logout', { method: 'POST', headers: { 'x-csrf-token': getCsrfCookie() } })
       toast.success('Logged out.')
-      router.push('/auth/login')
+      router.push('/')
     } catch {
       toast.error('Logout failed.')
       setLoggingOut(false)
