@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, CreditCard, LogOut, LayoutDashboard, ShieldCheck, Package, Heart, BarChart2 } from 'lucide-react'
+import { ChevronDown, CreditCard, LogOut, LayoutDashboard, ShieldCheck, Package, Heart, BarChart2, Receipt } from 'lucide-react'
 import { getCsrfCookie } from '@/app/components/providers/CsrfProvider'
 
 interface Props {
@@ -107,6 +107,14 @@ export function NavDropdown({ name, role }: Props) {
               >
                 <Heart className="h-4 w-4" />
                 Wishlist
+              </Link>
+              <Link
+                href="/orders"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] transition-colors"
+              >
+                <Receipt className="h-4 w-4" />
+                My Orders
               </Link>
               <div className="my-1 border-t border-[var(--border)]" />
             </>
