@@ -1,7 +1,7 @@
 'use client'
 
 import { ShoppingCart } from 'lucide-react'
-import { toast } from 'sonner'
+import toast from 'react-hot-toast'
 
 interface Props {
   wallpaperId: string
