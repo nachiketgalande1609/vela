@@ -110,12 +110,11 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
               body: JSON.stringify(response),
             })
             if (vRes.ok) {
-              toast.success('Vela+ activated!')
               setSubInCart(false)
               setItems([])
               setPackItems([])
               window.dispatchEvent(new Event('cart-updated'))
-              router.push('/dashboard')
+              router.push('/order-confirmation?type=subscription')
             } else {
               toast.error('Payment verification failed')
             }
@@ -143,9 +142,9 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
               }),
             })
             if (vRes.ok) {
-              toast.success('Payment successful!')
+              const vData = await vRes.json()
               window.dispatchEvent(new Event('cart-updated'))
-              router.push('/dashboard')
+              router.push(`/order-confirmation?type=order&pid=${vData.paymentId}&total=${vData.total}&count=${vData.purchased}`)
             } else {
               toast.error('Payment verification failed')
             }

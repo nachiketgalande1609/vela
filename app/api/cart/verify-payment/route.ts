@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth/dal'
 import { prisma } from '@/lib/db/prisma'
 import { verifyOrderPayment } from '@/lib/payment/verify'
+import { sendOrderConfirmationEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
   const session = await requireAuth()
@@ -15,15 +16,15 @@ export async function POST(req: NextRequest) {
   const [cartItems, packCartItems] = await Promise.all([
     prisma.cartItem.findMany({
       where: { userId: session.id },
-      include: { wallpaper: { select: { price: true } } },
+      include: { wallpaper: { select: { title: true, price: true } } },
     }),
     prisma.packCartItem.findMany({
       where: { userId: session.id },
-      include: { pack: { select: { price: true } } },
+      include: { pack: { select: { title: true, price: true } } },
     }),
   ])
 
-  let purchased = 0
+  const purchasedItems: { title: string; type: 'wallpaper' | 'pack'; price: number }[] = []
 
   for (const item of cartItems) {
     const alreadyOwned = await prisma.purchase.findUnique({
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
         amount: item.wallpaper.price,
       },
     })
-    purchased++
+    purchasedItems.push({ title: item.wallpaper.title, type: 'wallpaper', price: item.wallpaper.price })
   }
 
   for (const item of packCartItems) {
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
         amount: item.pack.price,
       },
     })
-    purchased++
+    purchasedItems.push({ title: item.pack.title, type: 'pack', price: item.pack.price })
   }
 
   await Promise.all([
@@ -62,5 +63,15 @@ export async function POST(req: NextRequest) {
     prisma.packCartItem.deleteMany({ where: { userId: session.id } }),
   ])
 
-  return NextResponse.json({ ok: true, purchased })
+  // Send confirmation email (non-blocking)
+  if (purchasedItems.length > 0) {
+    const user = await prisma.user.findUnique({ where: { id: session.id }, select: { email: true, name: true } })
+    if (user) {
+      const total = purchasedItems.reduce((sum, i) => sum + i.price, 0)
+      sendOrderConfirmationEmail(user.email, user.name ?? '', razorpay_payment_id, purchasedItems, total).catch(() => {})
+    }
+  }
+
+  const total = purchasedItems.reduce((sum, i) => sum + i.price, 0)
+  return NextResponse.json({ ok: true, purchased: purchasedItems.length, items: purchasedItems, total, paymentId: razorpay_payment_id })
 }

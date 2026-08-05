@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/auth/dal'
 import { prisma } from '@/lib/db/prisma'
 import { razorpay } from '@/lib/payment/razorpay'
 import { verifySubscriptionPayment } from '@/lib/payment/verify'
+import { sendSubscriptionConfirmationEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
   const session = await requireAuth()
@@ -14,11 +15,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid payment signature' }, { status: 400 })
   }
 
-  // Fetch subscription details from Razorpay to get period end
   const sub = await razorpay.subscriptions.fetch(razorpay_subscription_id)
   const currentPeriodEnd = new Date((sub.current_end as number) * 1000)
 
-  await Promise.all([
+  const [user] = await Promise.all([
+    prisma.user.findUnique({ where: { id: session.id }, select: { email: true, name: true } }),
     prisma.subscription.upsert({
       where: { userId: session.id },
       create: {
@@ -34,9 +35,13 @@ export async function POST(req: NextRequest) {
         currentPeriodEnd,
       },
     }),
-    // Clear subscription cart item after successful payment
     prisma.subscriptionCartItem.deleteMany({ where: { userId: session.id } }),
   ])
+
+  // Send confirmation email (non-blocking)
+  if (user) {
+    sendSubscriptionConfirmationEmail(user.email, user.name ?? '', currentPeriodEnd).catch(() => {})
+  }
 
   return NextResponse.json({ ok: true })
 }
