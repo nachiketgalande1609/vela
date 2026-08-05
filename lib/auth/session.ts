@@ -3,7 +3,7 @@ import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 import { env } from '@/lib/env'
 
-const ACCESS_EXPIRES_SECONDS = 15 * 60           // 15 minutes
+const ACCESS_EXPIRES_SECONDS = 4 * 60 * 60       // 4 hours
 const REFRESH_EXPIRES_SECONDS = 7 * 24 * 60 * 60 // 7 days
 const REMEMBER_EXPIRES_SECONDS = 30 * 24 * 60 * 60 // 30 days
 

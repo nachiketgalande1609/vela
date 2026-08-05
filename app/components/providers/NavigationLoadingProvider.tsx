@@ -12,6 +12,18 @@ export function NavigationLoadingProvider({ children }: { children: React.ReactN
     setLoading(false)
   }, [pathname])
 
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const anchor = (e.target as Element).closest('a')
+      if (!anchor) return
+      const href = anchor.getAttribute('href')
+      if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto') || anchor.target === '_blank') return
+      if (href !== pathname) setLoading(true)
+    }
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
+  }, [pathname])
+
   return (
     <Ctx.Provider value={{ startLoading: () => setLoading(true) }}>
       {children}
