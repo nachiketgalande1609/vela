@@ -10,7 +10,12 @@ import { NavSearch } from './NavSearch'
 
 export async function PublicNav() {
   const session = await verifySession()
-  const user = session ? await getUser(session.id) : null
+  let user = null
+  try {
+    user = session ? await getUser(session.id) : null
+  } catch {
+    user = null
+  }
 
   return (
     <>

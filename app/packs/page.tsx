@@ -9,19 +9,22 @@ import { Package } from 'lucide-react'
 export const metadata = { title: 'Wallpaper Packs' }
 
 export default async function PacksPage() {
-  const packs = await prisma.pack.findMany({
-    where: { published: true },
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id: true, title: true, description: true, price: true,
-      wallpapers: {
-        take: 4,
-        orderBy: { order: 'asc' },
-        select: { wallpaper: { select: { thumbPath: true, title: true } } },
+  let packs: Awaited<ReturnType<typeof prisma.pack.findMany>> = []
+  try {
+    packs = await prisma.pack.findMany({
+      where: { published: true },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true, title: true, description: true, price: true,
+        wallpapers: {
+          take: 4,
+          orderBy: { order: 'asc' },
+          select: { wallpaper: { select: { thumbPath: true, title: true } } },
+        },
+        _count: { select: { wallpapers: true } },
       },
-      _count: { select: { wallpapers: true } },
-    },
-  })
+    })
+  } catch {}
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
