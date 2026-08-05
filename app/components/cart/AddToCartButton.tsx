@@ -26,7 +26,7 @@ export function AddToCartButton({ wallpaperId, isAuthenticated, owned, isFree }:
     })
 
     if (res.status === 409) {
-      toast.info('Already in cart')
+      toast('Already in cart')
       return
     }
 
