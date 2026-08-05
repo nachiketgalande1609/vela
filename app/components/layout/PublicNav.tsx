@@ -6,6 +6,7 @@ import { NavDropdown } from './NavDropdown'
 import { GenreDropdown } from './GenreDropdown'
 import { NavSpacer } from './NavSpacer'
 import { CartIcon } from './CartIcon'
+import { NavSearch } from './NavSearch'
 
 export async function PublicNav() {
   const session = await verifySession()
@@ -18,11 +19,12 @@ export async function PublicNav() {
         className="fixed top-0 left-0 right-0 z-30 border-b border-[var(--border)] bg-[#0A0A0A]/75 backdrop-blur-md"
         style={{ WebkitBackdropFilter: 'blur(12px)' }}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-lg font-bold tracking-tight text-[var(--text)]" style={{ fontFamily: 'var(--font-playfair)' }}>
-            {siteConfig.name}
-          </Link>
-          <div className="flex items-center gap-5">
+        <div className="mx-auto flex max-w-7xl items-center gap-4 px-6 py-4">
+          {/* Left — logo + genre */}
+          <div className="flex items-center gap-5 shrink-0">
+            <Link href="/" className="text-lg font-bold tracking-tight text-[var(--text)]" style={{ fontFamily: 'var(--font-playfair)' }}>
+              {siteConfig.name}
+            </Link>
             <GenreDropdown />
             <Link href="/packs" className="hidden sm:block text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
               Packs
@@ -30,7 +32,14 @@ export async function PublicNav() {
             <Link href="/wallpapers/free" className="hidden sm:block text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
               Free
             </Link>
-            <Link href="/search" aria-label="Search" className="text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+          </div>
+
+          {/* Center — search bar (desktop only) */}
+          <NavSearch />
+
+          {/* Right — mobile search icon, cart, user */}
+          <div className="flex items-center gap-4 shrink-0 ml-auto sm:ml-0">
+            <Link href="/search" aria-label="Search" className="sm:hidden text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
               <Search size={18} />
             </Link>
             <CartIcon />
