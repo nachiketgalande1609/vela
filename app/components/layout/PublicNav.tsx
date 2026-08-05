@@ -25,6 +25,9 @@ export async function PublicNav() {
             <Link href="/packs" className="hidden sm:block text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
               Packs
             </Link>
+            <Link href="/wallpapers/free" className="hidden sm:block text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+              Free
+            </Link>
             {user ? (
               <NavDropdown name={user.name ?? user.email} role={user.role as 'ADMIN' | 'USER'} />
             ) : (

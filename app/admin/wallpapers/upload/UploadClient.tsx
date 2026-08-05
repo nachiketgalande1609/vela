@@ -225,9 +225,9 @@ export function UploadClient() {
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] uppercase tracking-widest text-[var(--text-muted)]">Price (INR ₹)</label>
-                  <input type="number" step="0.01" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required className={inputClass} />
+                  <input type="number" step="0.01" min="0" value={form.isFree ? '' : form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required={!form.isFree} disabled={form.isFree} placeholder={form.isFree ? 'Free' : ''} className={`${inputClass} disabled:opacity-40 disabled:cursor-not-allowed`} />
                   <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
-                    <input type="checkbox" checked={form.isFree} onChange={(e) => setForm({ ...form, isFree: e.target.checked })}
+                    <input type="checkbox" checked={form.isFree} onChange={(e) => setForm({ ...form, isFree: e.target.checked, price: e.target.checked ? '' : '99' })}
                       className="h-3.5 w-3.5 rounded-[2px] accent-[var(--accent)]" />
                     <span className="text-[10px] uppercase tracking-widest text-[var(--text-muted)]">Free download</span>
                   </label>
