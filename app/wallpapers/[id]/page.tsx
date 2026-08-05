@@ -25,9 +25,25 @@ export async function generateMetadata({ params }: PageProps) {
     const { id } = await params
     const wallpaper = await prisma.wallpaper.findUnique({
       where: { id, published: true },
-      select: { title: true },
+      select: { title: true, category: true, thumbPath: true, price: true, isFree: true },
     })
-    return { title: wallpaper?.title ?? 'Wallpaper' }
+    if (!wallpaper) return { title: 'Wallpaper' }
+    const description = `Download "${wallpaper.title}" — a premium ${wallpaper.category.toLowerCase()} mobile wallpaper${wallpaper.isFree ? ' for free' : ` for ₹${wallpaper.price}`} on Vela.`
+    return {
+      title: wallpaper.title,
+      description,
+      openGraph: {
+        title: wallpaper.title,
+        description,
+        images: [{ url: wallpaper.thumbPath, width: 400, height: 711, alt: wallpaper.title }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: wallpaper.title,
+        description,
+        images: [wallpaper.thumbPath],
+      },
+    }
   } catch {
     return { title: 'Wallpaper' }
   }
