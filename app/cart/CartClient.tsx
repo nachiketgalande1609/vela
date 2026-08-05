@@ -47,6 +47,7 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
   const [packItems, setPackItems] = useState(initialPackItems)
   const [subInCart, setSubInCart] = useState(initialSubInCart)
   const [loading, setLoading] = useState(false)
+  const [processingPayment, setProcessingPayment] = useState(false)
 
   async function removeItem(wallpaperId: string) {
     const res = await fetch('/api/cart', {
@@ -104,18 +105,21 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
           description: 'Vela+ Monthly Subscription',
           theme: { color: '#C8A97E' },
           handler: async (response: any) => {
+            // Clear cart immediately for instant visual feedback
+            setSubInCart(false)
+            setItems([])
+            setPackItems([])
+            setProcessingPayment(true)
+            window.dispatchEvent(new Event('cart-updated'))
             const vRes = await fetch('/api/subscriptions/verify', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(response),
             })
             if (vRes.ok) {
-              setSubInCart(false)
-              setItems([])
-              setPackItems([])
-              window.dispatchEvent(new Event('cart-updated'))
               router.push('/order-confirmation?type=subscription')
             } else {
+              setProcessingPayment(false)
               toast.error('Payment verification failed')
             }
           },
@@ -132,6 +136,11 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
           name: 'Vela',
           theme: { color: '#C8A97E' },
           handler: async (response: any) => {
+            // Clear cart immediately for instant visual feedback
+            setItems([])
+            setPackItems([])
+            setProcessingPayment(true)
+            window.dispatchEvent(new Event('cart-updated'))
             const vRes = await fetch('/api/cart/verify-payment', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -143,9 +152,9 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
             })
             if (vRes.ok) {
               const vData = await vRes.json()
-              window.dispatchEvent(new Event('cart-updated'))
               router.push(`/order-confirmation?type=order&pid=${vData.paymentId}&total=${vData.total}&count=${vData.purchased}`)
             } else {
+              setProcessingPayment(false)
               toast.error('Payment verification failed')
             }
           },
@@ -156,6 +165,15 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
     } finally {
       setLoading(false)
     }
+  }
+
+  if (processingPayment) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+        <p className="text-[var(--text-muted)]">Processing your payment…</p>
+      </div>
+    )
   }
 
   if (items.length === 0 && packItems.length === 0 && !subInCart) {
