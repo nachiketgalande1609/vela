@@ -3,7 +3,7 @@ import { PublicNav } from '@/app/components/layout/PublicNav'
 import { PageHeader } from '@/app/components/layout/PageHeader'
 import { UploadClient } from './UploadClient'
 
-export const metadata = { title: 'Upload Wallpapers — Vela' }
+export const metadata = { title: 'Upload Wallpapers' }
 
 export default async function UploadPage() {
   await requireAdmin()

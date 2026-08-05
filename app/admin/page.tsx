@@ -4,7 +4,7 @@ import { PageHeader } from '@/app/components/layout/PageHeader'
 import { prisma } from '@/lib/db/prisma'
 import { Users, MonitorSmartphone } from 'lucide-react'
 
-export const metadata = { title: 'Admin — Vela' }
+export const metadata = { title: 'Admin' }
 
 export default async function AdminPage() {
   await requireAdmin()

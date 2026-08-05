@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db/prisma'
 import { PublicNav } from '@/app/components/layout/PublicNav'
 import { AdminWallpapersClient } from './AdminWallpapersClient'
 
-export const metadata = { title: 'Manage Wallpapers — Vela' }
+export const metadata = { title: 'Manage Wallpapers' }
 
 export default async function AdminWallpapersPage() {
   await requireAdmin()

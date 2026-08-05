@@ -7,7 +7,7 @@ import { PublicNav } from '@/app/components/layout/PublicNav'
 import Link from 'next/link'
 import { PurchasedGrid } from './PurchasedGrid'
 
-export const metadata = { title: 'My Library — Vela' }
+export const metadata = { title: 'My Library' }
 
 export default async function DashboardPage() {
   const session = await requireAuth()
