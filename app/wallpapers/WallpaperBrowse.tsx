@@ -104,6 +104,7 @@ export function WallpaperBrowse({ isAuthenticated, category }: WallpaperBrowsePr
               wallpaper={w}
               isAuthenticated={isAuthenticated}
               owned={isOwned(w.id)}
+              wishlisted={w.wishlisted}
             />
           ))}
         </div>

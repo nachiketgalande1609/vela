@@ -42,7 +42,7 @@ export function AddToCartButton({ wallpaperId, isAuthenticated, owned, isFree }:
     <button
       onClick={handleClick}
       aria-label="Add to cart"
-      className="p-1.5 rounded-[4px] bg-black/40 hover:bg-black/60 transition-colors backdrop-blur-sm text-[var(--text-muted)] hover:text-[var(--text)]"
+      className="cursor-pointer p-1.5 rounded-[4px] bg-black/40 hover:bg-black/60 transition-colors backdrop-blur-sm text-[var(--text-muted)] hover:text-[var(--text)]"
     >
       <ShoppingCart size={16} />
     </button>

@@ -14,6 +14,7 @@ export function NavigationLoadingProvider({ children }: { children: React.ReactN
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
+      if (e.defaultPrevented) return
       const anchor = (e.target as Element).closest('a')
       if (!anchor) return
       const href = anchor.getAttribute('href')

@@ -33,7 +33,7 @@ export default async function CartPage() {
   return (
     <>
       <PublicNav />
-      <main className="mx-auto max-w-7xl px-3 pt-4 pb-6 sm:px-6 sm:py-8">
+      <main className="w-full mx-auto max-w-7xl px-3 pt-4 pb-6 sm:px-6 sm:py-8">
         <CartClient items={cartItems as any} ownedIds={ownedIds} />
       </main>
     </>

@@ -120,10 +120,11 @@ export function CartClient({ items: initialItems, ownedIds }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+    <div className="space-y-4">
+      <h1 className="text-xl font-semibold text-[var(--text)]">Your Cart</h1>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start">
       {/* Items list */}
-      <div className="flex-1 lg:w-2/3 space-y-3">
-        <h1 className="text-xl font-semibold text-[var(--text)]">Your Cart</h1>
+      <div className="lg:col-span-2 space-y-3">
         {items.map((item) => {
           const owned = ownedIds.includes(item.wallpaperId)
           return (
@@ -164,7 +165,7 @@ export function CartClient({ items: initialItems, ownedIds }: Props) {
       </div>
 
       {/* Order summary */}
-      <div className="lg:w-1/3 rounded-[4px] border border-[var(--border)] bg-[var(--card)] p-5 space-y-4 lg:sticky lg:top-24">
+      <div className="lg:col-span-1 rounded-[4px] border border-[var(--border)] bg-[var(--card)] p-5 space-y-4 lg:sticky lg:top-24">
         <h2 className="text-base font-semibold text-[var(--text)]">Order Summary</h2>
         <div className="flex justify-between text-sm text-[var(--text-muted)]">
           <span>Items ({billableItems.length})</span>
@@ -182,6 +183,7 @@ export function CartClient({ items: initialItems, ownedIds }: Props) {
           {loading ? 'Processing…' : 'Checkout'}
         </button>
       </div>
+    </div>
     </div>
   )
 }

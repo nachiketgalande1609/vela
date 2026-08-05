@@ -12,6 +12,7 @@ export interface WallpaperCardData {
   category: string
   thumbPath: string
   isFree?: boolean
+  wishlisted?: boolean
 }
 
 interface WallpaperCardProps {

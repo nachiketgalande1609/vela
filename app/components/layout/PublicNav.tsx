@@ -19,27 +19,23 @@ export async function PublicNav() {
         className="fixed top-0 left-0 right-0 z-30 border-b border-[var(--border)] bg-[#0A0A0A]/75 backdrop-blur-md"
         style={{ WebkitBackdropFilter: 'blur(12px)' }}
       >
-        <div className="mx-auto flex max-w-7xl items-center gap-4 px-6 py-4">
-          {/* Left — logo + genre */}
-          <div className="flex items-center gap-5 shrink-0">
-            <Link href="/" className="text-lg font-bold tracking-tight text-[var(--text)]" style={{ fontFamily: 'var(--font-playfair)' }}>
-              {siteConfig.name}
-            </Link>
+        <div className="mx-auto flex max-w-7xl items-center px-6 py-4 gap-6">
+          {/* Left — logo */}
+          <Link href="/" className="text-lg font-bold tracking-tight text-[var(--text)] shrink-0" style={{ fontFamily: 'var(--font-playfair)' }}>
+            {siteConfig.name}
+          </Link>
+
+          {/* Center — search bar (desktop only, fills remaining space) */}
+          <NavSearch />
+
+          {/* Right — nav links + cart + user */}
+          <div className="flex items-center gap-5 shrink-0 ml-auto">
             <GenreDropdown />
             <Link href="/packs" className="hidden sm:block text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
               Packs
             </Link>
-            <Link href="/wallpapers/free" className="hidden sm:block text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-              Free
-            </Link>
-          </div>
-
-          {/* Center — search bar (desktop only) */}
-          <NavSearch />
-
-          {/* Right — mobile search icon, cart, user */}
-          <div className="flex items-center gap-4 shrink-0 ml-auto sm:ml-0">
-            <Link href="/search" aria-label="Search" className="sm:hidden text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+            {/* Mobile search icon */}
+            <Link href="/search" aria-label="Search" className="lg:hidden text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
               <Search size={18} />
             </Link>
             <CartIcon />

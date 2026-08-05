@@ -12,6 +12,7 @@ import { SubscribeButton } from '@/app/components/wallpapers/SubscribeButton'
 import { canDownload } from '@/lib/wallpapers/can-download'
 import { WallpaperCard } from '@/app/components/wallpapers/WallpaperCard'
 import { BuyPackButton } from '@/app/components/packs/BuyPackButton'
+import { WallpaperDetailActions } from '@/app/components/wallpapers/WallpaperDetailActions'
 import { PurchaseSuccessBanner } from './PurchaseSuccessBanner'
 import { Tag, Package } from 'lucide-react'
 
@@ -61,18 +62,24 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
   let ownedIds: string[] = []
   let hasSubscription = false
   let ownedPackIds: string[] = []
+  let initialWishlisted = false
+  let initialInCart = false
   if (session) {
     try {
-      const [access, sub, purchases, packPurchases] = await Promise.all([
+      const [access, sub, purchases, packPurchases, wishlistRow, cartRow] = await Promise.all([
         canDownload(session.id, id),
         prisma.subscription.findUnique({ where: { userId: session.id }, select: { status: true, currentPeriodEnd: true } }),
         prisma.purchase.findMany({ where: { userId: session.id }, select: { wallpaperId: true } }),
         prisma.packPurchase.findMany({ where: { userId: session.id }, select: { packId: true } }),
+        prisma.wishlist.findUnique({ where: { userId_wallpaperId: { userId: session.id, wallpaperId: id } } }),
+        prisma.cartItem.findUnique({ where: { userId_wallpaperId: { userId: session.id, wallpaperId: id } } }),
       ])
       canAccess = access
       hasSubscription = sub?.status === 'active' && new Date() < (sub?.currentPeriodEnd ?? 0)
       ownedIds = purchases.map((p) => p.wallpaperId)
       ownedPackIds = packPurchases.map((p) => p.packId)
+      initialWishlisted = !!wishlistRow
+      initialInCart = !!cartRow
     } catch { /* DB unavailable */ }
   }
 
@@ -176,34 +183,45 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
             )}
 
             <div className="border-t border-[var(--border)] pt-6">
-              {wallpaper.isFree ? (
-                <div className="flex flex-col gap-3">
-                  <p className="text-xs text-emerald-400">Free wallpaper — no purchase needed</p>
-                  <DownloadButton wallpaperId={id} className="w-full justify-center" />
-                </div>
-              ) : canAccess ? (
-                <div className="flex flex-col gap-3">
-                  <p className="text-xs text-[var(--accent)]">You have access to this wallpaper</p>
-                  <DownloadButton wallpaperId={id} className="w-full justify-center" />
-                </div>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  <PurchaseButton
-                    wallpaperId={id}
-                    price={wallpaper.price}
-                    isAuthenticated={!!session}
-                  />
-                  <div className="flex items-center gap-3">
-                    <div className="h-px flex-1 bg-[var(--border)]" />
-                    <span className="text-xs text-[var(--text-muted)]">or</span>
-                    <div className="h-px flex-1 bg-[var(--border)]" />
+              <WallpaperDetailActions
+                wallpaperId={id}
+                isAuthenticated={!!session}
+                initialWishlisted={initialWishlisted}
+                initialInCart={initialInCart}
+                owned={canAccess}
+                isFree={wallpaper.isFree}
+              />
+
+              <div className="mt-3">
+                {wallpaper.isFree ? (
+                  <div className="flex flex-col gap-3">
+                    <p className="text-xs text-emerald-400">Free wallpaper — no purchase needed</p>
+                    <DownloadButton wallpaperId={id} className="w-full justify-center" />
                   </div>
-                  <SubscribeButton isAuthenticated={!!session} className="w-full justify-center" />
-                  <p className="text-center text-[10px] text-[var(--text-muted)]">
-                    Subscribe once — download every wallpaper on Vela
-                  </p>
-                </div>
-              )}
+                ) : canAccess ? (
+                  <div className="flex flex-col gap-3">
+                    <p className="text-xs text-[var(--accent)]">You have access to this wallpaper</p>
+                    <DownloadButton wallpaperId={id} className="w-full justify-center" />
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <PurchaseButton
+                      wallpaperId={id}
+                      price={wallpaper.price}
+                      isAuthenticated={!!session}
+                    />
+                    <div className="flex items-center gap-3">
+                      <div className="h-px flex-1 bg-[var(--border)]" />
+                      <span className="text-xs text-[var(--text-muted)]">or</span>
+                      <div className="h-px flex-1 bg-[var(--border)]" />
+                    </div>
+                    <SubscribeButton isAuthenticated={!!session} className="w-full justify-center" />
+                    <p className="text-center text-[10px] text-[var(--text-muted)]">
+                      Subscribe once — download every wallpaper on Vela
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
 
             {wallpaperPacks.length > 0 && (

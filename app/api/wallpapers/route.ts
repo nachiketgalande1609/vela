@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { getAccessToken, verifyAccessToken } from '@/lib/auth/session'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl
@@ -12,8 +13,18 @@ export async function GET(req: NextRequest) {
     ...(category && category !== 'All' ? { category } : {}),
   }
 
+  // Resolve current user if authenticated
+  let userId: string | null = null
   try {
-    const [wallpapers, total] = await Promise.all([
+    const token = await getAccessToken()
+    if (token) {
+      const payload = await verifyAccessToken(token)
+      if (payload) userId = payload.sub
+    }
+  } catch {}
+
+  try {
+    const [wallpapers, total, wishlistItems] = await Promise.all([
       prisma.wallpaper.findMany({
         where,
         orderBy: { createdAt: 'desc' },
@@ -25,8 +36,15 @@ export async function GET(req: NextRequest) {
         },
       }),
       prisma.wallpaper.count({ where }),
+      userId
+        ? prisma.wishlist.findMany({ where: { userId }, select: { wallpaperId: true } })
+        : Promise.resolve([]),
     ])
-    return NextResponse.json({ wallpapers, total, page, pages: Math.ceil(total / limit) })
+
+    const wishlistedSet = new Set(wishlistItems.map((w) => w.wallpaperId))
+    const result = wallpapers.map((w) => ({ ...w, wishlisted: wishlistedSet.has(w.id) }))
+
+    return NextResponse.json({ wallpapers: result, total, page, pages: Math.ceil(total / limit) })
   } catch {
     return NextResponse.json({ wallpapers: [], total: 0, page, pages: 0 }, { status: 200 })
   }

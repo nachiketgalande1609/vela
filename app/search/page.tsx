@@ -12,10 +12,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <>
       <PublicNav />
-      <main className="mx-auto max-w-7xl px-3 pt-4 pb-6 sm:px-6 sm:py-8">
-        <h1 className="mb-6 text-xl font-semibold text-[var(--text)]">
-          {q ? `Search results for "${q}"` : 'Search'}
-        </h1>
+      <main className="w-full mx-auto max-w-7xl px-3 pt-4 pb-6 sm:px-6 sm:py-8">
         <SearchClient initialQuery={q} />
       </main>
     </>

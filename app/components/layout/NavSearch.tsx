@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Search, X } from 'lucide-react'
 import Image from 'next/image'
 
@@ -14,6 +14,7 @@ interface Result {
 }
 
 export function NavSearch() {
+  const pathname = usePathname()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Result[]>([])
   const [open, setOpen] = useState(false)
@@ -22,6 +23,8 @@ export function NavSearch() {
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  if (pathname === '/search') return null
 
   const fetchResults = useCallback(async (q: string) => {
     if (!q.trim()) { setResults([]); setOpen(false); return }
@@ -69,7 +72,7 @@ export function NavSearch() {
   }
 
   return (
-    <div ref={containerRef} className="relative hidden sm:flex flex-1 max-w-xl mx-6">
+    <div ref={containerRef} className="relative hidden lg:flex flex-1 mx-6">
       <div className="relative w-full">
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
         <input

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Heart } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -11,6 +11,10 @@ interface WishlistButtonProps {
 
 export function WishlistButton({ wallpaperId, initialWishlisted = false, isAuthenticated }: WishlistButtonProps) {
   const [wishlisted, setWishlisted] = useState(initialWishlisted)
+
+  useEffect(() => {
+    setWishlisted(initialWishlisted)
+  }, [initialWishlisted])
 
   async function handleClick(e: React.MouseEvent) {
     e.preventDefault()
@@ -40,7 +44,7 @@ export function WishlistButton({ wallpaperId, initialWishlisted = false, isAuthe
   return (
     <button
       onClick={handleClick}
-      className="p-1.5 rounded-[4px] bg-black/40 hover:bg-black/60 transition-colors backdrop-blur-sm"
+      className="cursor-pointer p-1.5 rounded-[4px] bg-black/40 hover:bg-black/60 transition-colors backdrop-blur-sm"
       aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
     >
       <Heart
