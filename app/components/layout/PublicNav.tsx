@@ -34,23 +34,23 @@ export async function PublicNav() {
           <NavSearch />
 
           {/* Right — nav links + cart + user */}
-          <div className="flex items-center gap-5 shrink-0 ml-auto">
+          <div className="flex items-center gap-3 sm:gap-5 shrink-0 ml-auto">
             <GenreDropdown />
             <Link href="/packs" className="hidden sm:flex items-center gap-1 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-              <Layers className="h-3.5 w-3.5" />
-              Packs
+              <Layers className="h-6 w-6 sm:h-5 sm:w-5" />
+              <span>Packs</span>
             </Link>
             {/* Mobile search icon */}
             <Link href="/search" aria-label="Search" className="lg:hidden text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-              <Search size={18} />
+              <Search className="h-6 w-6 sm:h-5 sm:w-5" />
             </Link>
             <CartIcon />
             {user ? (
               <NavDropdown name={user.name ?? user.email} role={user.role as 'ADMIN' | 'USER'} />
             ) : (
               <Link href="/auth/login" className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-                <LogIn size={15} />
-                Sign In
+                <LogIn className="h-6 w-6 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Sign In</span>
               </Link>
             )}
           </div>

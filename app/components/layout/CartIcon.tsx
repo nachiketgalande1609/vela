@@ -28,7 +28,7 @@ export function CartIcon() {
 
   return (
     <Link href="/cart" className="relative text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-      <ShoppingCart size={20} />
+      <ShoppingCart className="h-6 w-6 sm:h-5 sm:w-5" />
       {count > 0 && (
         <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-red-500 text-[9px] font-bold text-white flex items-center justify-center">
           {count > 99 ? '99+' : count}
