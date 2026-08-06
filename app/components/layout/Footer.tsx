@@ -9,7 +9,7 @@ export function Footer() {
         <img src="/icon.svg" alt="Vela" width={18} height={18} />
       </div>
       <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--text-muted)]">
-        <p>© {new Date().getFullYear()} Vela. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Vela. All rights reserved. · All wallpapers are AI-generated.</p>
         <div className="flex items-center gap-5">
           <Link href="/about" className="hover:text-[var(--text)] transition-colors">About</Link>
           <Link href="/privacy" className="hover:text-[var(--text)] transition-colors">Privacy Policy</Link>

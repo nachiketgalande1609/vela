@@ -99,9 +99,10 @@ export default function TermsOfServicePage() {
             <h2 className="text-base font-semibold text-[var(--text)] mb-3">7. Intellectual Property</h2>
             <p>
               All content on the Service — including wallpaper images, website design, logos, and text — is the
-              property of Vela or its content creators and is protected under Indian copyright law (Copyright Act, 1957)
-              and applicable international treaties. Unauthorised reproduction or distribution is prohibited and may
-              result in legal action.
+              exclusive property of Vela and is protected under Indian copyright law (Copyright Act, 1957) and
+              applicable international treaties. All wallpapers on Vela are AI-generated works owned by Vela;
+              no third-party content creators hold rights to these images. Unauthorised reproduction or distribution
+              is prohibited and may result in legal action.
             </p>
           </section>
 

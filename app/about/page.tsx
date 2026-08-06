@@ -26,8 +26,8 @@ export default async function AboutPage() {
   const values = [
     {
       icon: Layers,
-      title: 'Curated, not crowdsourced',
-      body: 'Every wallpaper on Vela is handpicked and edited. No noise, no filler — just walls worth putting on your phone.',
+      title: 'AI-generated, carefully curated',
+      body: 'Every wallpaper on Vela is created using AI and reviewed before publishing. No noise, no filler — just walls worth putting on your phone.',
     },
     {
       icon: Zap,
@@ -59,7 +59,7 @@ export default async function AboutPage() {
           </h1>
           <p className="text-[var(--text-muted)] text-base leading-relaxed max-w-xl mx-auto">
             Vela started with a simple frustration — free wallpaper sites are full of clutter, watermarks, and low-res JPEGs.
-            Premium phones deserve better walls. So we built a place to find them.
+            Premium phones deserve better walls. So we built a place to find them — every wallpaper on Vela is AI-generated, curated, and optimised for your screen.
           </p>
         </div>
 
@@ -102,7 +102,7 @@ export default async function AboutPage() {
             <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-lg">
               Designer, developer, and the person who spent way too long looking for a good dark wallpaper.
               Vela is a side project built out of genuine need — a clean, well-curated place to find wallpapers
-              you&apos;d actually want to pay for. Every wallpaper is personally reviewed before it goes live.
+              you&apos;d actually want to pay for. Every wallpaper is AI-generated and reviewed before it goes live.
             </p>
             <p className="mt-3 text-xs text-[var(--text-muted)]">
               Questions or feedback?{' '}

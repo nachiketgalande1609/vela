@@ -65,10 +65,10 @@ export default function LicencePage() {
           <section>
             <h2 className="text-base font-semibold text-[var(--text)] mb-3">2. Ownership</h2>
             <p>
-              All wallpapers available on Vela are the exclusive intellectual property of Vela or its respective
-              content creators. Purchase of a wallpaper constitutes the purchase of a limited licence to use the
-              file — it does not transfer ownership, copyright, or any other intellectual property rights to
-              the Licensee. The wallpapers are protected under the Indian Copyright Act, 1957.
+              All wallpapers available on Vela are AI-generated works and are the exclusive intellectual property
+              of Vela. Purchase of a wallpaper constitutes the purchase of a limited licence to use the file —
+              it does not transfer ownership, copyright, or any other intellectual property rights to the Licensee.
+              The wallpapers are protected under the Indian Copyright Act, 1957.
             </p>
           </section>
 
