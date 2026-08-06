@@ -21,41 +21,41 @@ function PhoneShell({ src, alt, children }: { src: string; alt: string; children
     <div
       className="relative mx-auto flex-shrink-0"
       style={{
-        width: 248,
-        borderRadius: 42,
-        background: 'linear-gradient(160deg, #242424 0%, #0f0f0f 100%)',
-        padding: 7,
+        width: 252,
+        borderRadius: 46,
+        background: 'linear-gradient(160deg, #2a2a2a 0%, #0c0c0c 100%)',
+        padding: 4,
         boxShadow:
-          '0 0 0 1px #303030, inset 0 0 0 0.5px #3a3a3a, 0 30px 90px rgba(0,0,0,0.75)',
+          '0 0 0 0.5px #404040, 0 0 0 1.5px #1a1a1a, inset 0 0 0 0.5px #3a3a3a, 0 40px 100px rgba(0,0,0,0.85), 0 8px 24px rgba(0,0,0,0.5)',
       }}
     >
-      {/* Dynamic Island */}
+      {/* Dynamic Island — iPhone 17: narrower pill */}
       <div
         style={{
           position: 'absolute',
           zIndex: 20,
-          top: 15,
+          top: 12,
           left: '50%',
           transform: 'translateX(-50%)',
-          width: 78,
-          height: 24,
-          borderRadius: 12,
+          width: 62,
+          height: 19,
+          borderRadius: 10,
           background: '#000',
         }}
       />
       {/* Action button */}
-      <div style={{ position: 'absolute', top: 100, left: -3, width: 3, height: 18, borderRadius: 1.5, background: '#1e1e1e' }} />
+      <div style={{ position: 'absolute', top: 96, left: -2.5, width: 2.5, height: 16, borderRadius: 1.5, background: '#252525' }} />
       {/* Volume up */}
-      <div style={{ position: 'absolute', top: 130, left: -3, width: 3, height: 34, borderRadius: 1.5, background: '#1e1e1e' }} />
+      <div style={{ position: 'absolute', top: 124, left: -2.5, width: 2.5, height: 32, borderRadius: 1.5, background: '#252525' }} />
       {/* Volume down */}
-      <div style={{ position: 'absolute', top: 173, left: -3, width: 3, height: 34, borderRadius: 1.5, background: '#1e1e1e' }} />
+      <div style={{ position: 'absolute', top: 164, left: -2.5, width: 2.5, height: 32, borderRadius: 1.5, background: '#252525' }} />
       {/* Power / side */}
-      <div style={{ position: 'absolute', top: 140, right: -3, width: 3, height: 52, borderRadius: 1.5, background: '#1e1e1e' }} />
+      <div style={{ position: 'absolute', top: 136, right: -2.5, width: 2.5, height: 50, borderRadius: 1.5, background: '#252525' }} />
 
       {/* Screen */}
       <div
         style={{
-          borderRadius: 35,
+          borderRadius: 42,
           overflow: 'hidden',
           aspectRatio: '9/19.5',
           position: 'relative',
@@ -170,12 +170,145 @@ function LockOverlay() {
 
 // ─── Home-screen overlay ──────────────────────────────────────────────────────
 
-const APP_ICONS: string[] = [
-  '#2dd36f', '#3478f6', '#ff9f0a', '#ff2d55',
-  '#636366', '#30d158', '#ff375f', '#8e8e93',
-  '#3478f6', '#ff3b30', '#1c1c1e', '#ffd60a',
+function SvgIcon({ bg, size = 42, fill = false, children }: { bg: string; size?: number; fill?: boolean; children: React.ReactNode }) {
+  const iconSize = fill ? size : Math.round(size * 0.64)
+  return (
+    <div style={{ width: size, height: size, borderRadius: Math.round(size * 0.225), background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+      <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" style={{ display: 'block' }}>
+        {children}
+      </svg>
+    </div>
+  )
+}
+
+// ── Shared icon paths ─────────────────────────────────────────────────────────
+
+const PhoneIcon = () => (
+  <path d="M6.8 10.6c1.3 2.6 3.6 4.8 6.2 6.2l2.1-2.1c.3-.3.6-.3.9-.1 1 .4 2.2.6 3.4.6.5 0 .9.4.9.9v3.4c0 .5-.4.9-.9.9C9.5 20.4 3 13.9 3 5.9c0-.5.4-.9.9-.9H7.4c.5 0 .9.4.9.9 0 1.2.2 2.4.6 3.4.1.3 0 .6-.1.9l-2 2.4z" fill="white"/>
+)
+
+const FaceTimeIcon = () => (
+  <>
+    <path d="M2 8.5C2 7.4 2.9 6.5 4 6.5H13.5C14.6 6.5 15.5 7.4 15.5 8.5V15.5C15.5 16.6 14.6 17.5 13.5 17.5H4C2.9 17.5 2 16.6 2 15.5V8.5Z" fill="white"/>
+    <path d="M15.5 10.2L22 7.5V16.5L15.5 13.8V10.2Z" fill="white"/>
+  </>
+)
+
+const SafariIcon = () => (
+  <>
+    {/* Outer ring */}
+    <circle cx="12" cy="12" r="10" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.6"/>
+    {/* 4 cardinal ticks only */}
+    <line x1="12" y1="2.5" x2="12" y2="4.5" stroke="rgba(255,255,255,0.5)" strokeWidth="1.3" strokeLinecap="round"/>
+    <line x1="21.5" y1="12" x2="19.5" y2="12" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeLinecap="round"/>
+    <line x1="12" y1="21.5" x2="12" y2="19.5" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeLinecap="round"/>
+    <line x1="2.5" y1="12" x2="4.5" y2="12" stroke="rgba(255,255,255,0.35)" strokeWidth="1" strokeLinecap="round"/>
+    {/* N needle — white (pointing up) */}
+    <polygon points="12,4 13.8,11.5 12,10 10.2,11.5" fill="white"/>
+    {/* S needle — red (pointing down) */}
+    <polygon points="12,20 10.2,12.5 12,14 13.8,12.5" fill="#FF3B30"/>
+    <circle cx="12" cy="12" r="1.6" fill="white"/>
+  </>
+)
+
+const CameraIcon = () => (
+  <>
+    <path d="M22 17C22 18.1 21.1 19 20 19H4C2.9 19 2 18.1 2 17V9C2 7.9 2.9 7 4 7H7.5L9.5 5H14.5L16.5 7H20C21.1 7 22 7.9 22 9V17Z" fill="none" stroke="white" strokeWidth="1.3"/>
+    <circle cx="12" cy="13" r="3.8" fill="none" stroke="white" strokeWidth="1.3"/>
+    <circle cx="12" cy="13" r="1.7" fill="rgba(255,255,255,0.28)"/>
+    <circle cx="18.5" cy="9.5" r="1" fill="white"/>
+  </>
+)
+
+// ── Grid + Dock data ──────────────────────────────────────────────────────────
+
+const APP_GRID_DATA: { icon: React.ReactNode; label: string }[] = [
+  {
+    label: 'Safari',
+    icon: <SvgIcon bg="linear-gradient(175deg,#1194FA 0%,#006ADE 100%)"><SafariIcon /></SvgIcon>,
+  },
+  {
+    label: 'FaceTime',
+    icon: <SvgIcon bg="linear-gradient(180deg,#62DB5B 0%,#22A830 100%)"><FaceTimeIcon /></SvgIcon>,
+  },
+  {
+    label: 'Photos',
+    icon: (
+      <SvgIcon bg="white" fill>
+        {(['#FF3B30','#FF9500','#FFCC00','#34C759','#30B0C7','#007AFF','#5856D6','#FF2D55'] as const).map((c, i) => (
+          <g key={i} transform={`rotate(${i * 45} 12 12)`}>
+            <ellipse cx="12" cy="6" rx="2.6" ry="4.4" fill={c}/>
+          </g>
+        ))}
+        <circle cx="12" cy="12" r="3.6" fill="white"/>
+      </SvgIcon>
+    ),
+  },
+  {
+    label: 'Camera',
+    icon: <SvgIcon bg="linear-gradient(145deg,#3A3A3C 0%,#1C1C1E 100%)"><CameraIcon /></SvgIcon>,
+  },
+  {
+    label: 'App Store',
+    icon: (
+      <SvgIcon bg="linear-gradient(180deg,#35AEFF 0%,#0076E4 100%)">
+        <path d="M12 4.5 L6 18.5" stroke="white" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+        <path d="M12 4.5 L18 18.5" stroke="white" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+        <line x1="8" y1="13" x2="16" y2="13" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
+        <line x1="5" y1="20.5" x2="19" y2="20.5" stroke="rgba(255,255,255,0.55)" strokeWidth="1.4" strokeLinecap="round"/>
+      </SvgIcon>
+    ),
+  },
+  {
+    label: 'Phone',
+    icon: <SvgIcon bg="linear-gradient(180deg,#62DB5B 0%,#22A830 100%)"><PhoneIcon /></SvgIcon>,
+  },
+  {
+    label: 'Calendar',
+    icon: (
+      <SvgIcon bg="white" fill>
+        <rect x="0" y="0" width="24" height="24" fill="white"/>
+        <rect x="0" y="0" width="24" height="8.5" fill="#FF3B30"/>
+        <text x="12" y="6.5" textAnchor="middle" fontSize="4.5" fontWeight="700" fill="white" fontFamily="system-ui,sans-serif">AUG</text>
+        <text x="12" y="21" textAnchor="middle" fontSize="11" fontWeight="200" fill="#1C1C1E" fontFamily="system-ui,sans-serif">6</text>
+      </SvgIcon>
+    ),
+  },
+  {
+    label: 'Settings',
+    icon: (
+      <SvgIcon bg="linear-gradient(180deg,#AEAEB2 0%,#636366 100%)">
+        <defs>
+          <mask id="gear-mask">
+            <rect width="24" height="24" fill="white"/>
+            <circle cx="12" cy="12" r="3.4" fill="black"/>
+          </mask>
+        </defs>
+        <g mask="url(#gear-mask)">
+          <circle cx="12" cy="12" r="5.8" fill="white"/>
+          {[0,45,90,135,180,225,270,315].map(deg => (
+            <rect key={deg} x="10.8" y="1.8" width="2.4" height="4.8" rx="1.2" fill="white" transform={`rotate(${deg} 12 12)`}/>
+          ))}
+        </g>
+      </SvgIcon>
+    ),
+  },
 ]
-const DOCK_ICONS = ['#2dd36f', '#3478f6', '#ff9f0a', '#ff375f']
+
+const DOCK_APPS_DATA = [
+  <SvgIcon key="d-phone" bg="linear-gradient(180deg,#62DB5B 0%,#22A830 100%)">
+    <PhoneIcon />
+  </SvgIcon>,
+  <SvgIcon key="d-facetime" bg="linear-gradient(180deg,#62DB5B 0%,#22A830 100%)">
+    <FaceTimeIcon />
+  </SvgIcon>,
+  <SvgIcon key="d-safari" bg="linear-gradient(175deg,#1194FA 0%,#006ADE 100%)">
+    <SafariIcon />
+  </SvgIcon>,
+  <SvgIcon key="d-camera" bg="linear-gradient(145deg,#3A3A3C 0%,#1C1C1E 100%)">
+    <CameraIcon />
+  </SvgIcon>,
+]
 
 function HomeOverlay() {
   return (
@@ -185,8 +318,8 @@ function HomeOverlay() {
         inset: 0,
         display: 'flex',
         flexDirection: 'column',
-        padding: '30px 14px 12px',
-        background: 'rgba(0,0,0,0.08)',
+        padding: '10px 10px 0px',
+        background: 'rgba(0,0,0,0.05)',
       }}
     >
       {/* Status bar */}
@@ -199,25 +332,23 @@ function HomeOverlay() {
           fontWeight: 600,
           color: 'white',
           fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-          marginBottom: 18,
+          marginBottom: 12,
+          padding: '0 10px',
         }}
       >
         <span>9:41</span>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-          {/* Signal */}
           <svg width="13" height="9" viewBox="0 0 13 9" fill="white">
             <rect x="0" y="5" width="2.5" height="4" rx="0.5"/>
             <rect x="3.5" y="3" width="2.5" height="6" rx="0.5"/>
             <rect x="7" y="1" width="2.5" height="8" rx="0.5"/>
             <rect x="10.5" y="0" width="2.5" height="9" rx="0.5" opacity="0.35"/>
           </svg>
-          {/* Wifi */}
           <svg width="13" height="9" viewBox="0 0 20 14" fill="white">
             <path d="M10 10.5l1.8 2.5H8.2L10 10.5z"/>
             <path d="M6.5 7.5c.9-.9 2.2-1.5 3.5-1.5s2.6.6 3.5 1.5" stroke="white" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
             <path d="M2.5 4C4.7 1.8 7.2.5 10 .5s5.3 1.3 7.5 3.5" stroke="white" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
           </svg>
-          {/* Battery */}
           <svg width="18" height="9" viewBox="0 0 18 9" fill="white">
             <rect x="0" y="0.5" width="14" height="8" rx="2" fill="none" stroke="white" strokeWidth="1"/>
             <rect x="14.5" y="2.5" width="2" height="4" rx="1"/>
@@ -226,17 +357,35 @@ function HomeOverlay() {
         </div>
       </div>
 
-      {/* App grid */}
+      <div style={{ flex: 1 }} />
+
+      {/* App grid — pinned to bottom above dock */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: 10,
-          flex: 1,
+          gap: 6,
+          alignContent: 'end',
+          marginBottom: 8,
+          justifyItems: 'center',
         }}
       >
-        {APP_ICONS.map((color, i) => (
-          <div key={i} style={{ aspectRatio: '1', borderRadius: 13, background: color }} />
+        {APP_GRID_DATA.map(({ icon, label }) => (
+          <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            {icon}
+            <span style={{
+              fontSize: 8,
+              color: 'white',
+              fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+              textAlign: 'center',
+              textShadow: '0 0.5px 2px rgba(0,0,0,0.6)',
+              lineHeight: 2,
+              maxWidth: 44,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}>{label}</span>
+          </div>
         ))}
       </div>
 
@@ -246,20 +395,19 @@ function HomeOverlay() {
           display: 'flex',
           justifyContent: 'space-around',
           alignItems: 'center',
-          background: 'rgba(255,255,255,0.15)',
+          background: 'rgba(255,255,255,0.18)',
           backdropFilter: 'blur(20px)',
-          borderRadius: 22,
-          padding: '10px 6px',
-          marginTop: 10,
+          borderRadius: 18,
+          padding: '8px 2px',
         }}
       >
-        {DOCK_ICONS.map((color, i) => (
-          <div key={i} style={{ width: 44, height: 44, borderRadius: 12, background: color }} />
+        {DOCK_APPS_DATA.map((icon, i) => (
+          <div key={i} style={{ width: 42, height: 42 }}>{icon}</div>
         ))}
       </div>
 
       {/* Home indicator */}
-      <div style={{ width: 90, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.35)', margin: '10px auto 0' }} />
+      <div style={{ width: 90, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.35)', margin: '8px auto 0' }} />
     </div>
   )
 }
