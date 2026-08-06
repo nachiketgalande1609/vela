@@ -93,7 +93,7 @@ function LockOverlay() {
       <div style={{ marginTop: '22%', textAlign: 'center' }}>
         <div
           style={{
-            fontSize: 54,
+            fontSize: 70,
             fontWeight: 200,
             color: '#fff',
             letterSpacing: -1,
@@ -121,11 +121,11 @@ function LockOverlay() {
       <div
         style={{
           marginTop: 28,
-          width: '90%',
-          background: 'rgba(255,255,255,0.12)',
+          width: '100%',
+          background: 'rgba(77, 76, 76, 0.5)',
           backdropFilter: 'blur(20px)',
           borderRadius: 14,
-          padding: '10px 14px',
+          padding: '10px 10px',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
@@ -148,9 +148,17 @@ function LockOverlay() {
       <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {/* Flashlight */}
         <div style={{ width: 44, height: 44, borderRadius: 22, background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 6c0 2-2 2-2 4v10a2 2 0 0 1-4 0V10c0-2-2-2-2-4a6 6 0 1 1 8 0z"/>
-            <line x1="6" y1="6" x2="6.01" y2="6"/>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="white">
+            {/* Handle */}
+            <rect x="10" y="13.5" width="4" height="7.5" rx="1.3"/>
+            {/* Head/reflector — trapezoid */}
+            <path d="M8.5 8 L15.5 8 L14 13.5 L10 13.5 Z"/>
+            {/* Lens bar */}
+            <rect x="9.5" y="6" width="5" height="2" rx="1"/>
+            {/* Light rays */}
+            <line x1="12" y1="3.8" x2="12" y2="2.2" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
+            <line x1="8.5" y1="4.8" x2="7.2" y2="3.5" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
+            <line x1="15.5" y1="4.8" x2="16.8" y2="3.5" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
           </svg>
         </div>
         {/* Camera */}
