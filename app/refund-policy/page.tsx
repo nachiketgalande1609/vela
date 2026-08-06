@@ -19,7 +19,7 @@ export default function RefundPolicyPage() {
             <p className="text-xs font-semibold uppercase tracking-widest text-red-400 mb-4">Not eligible for refund</p>
             <ul className="space-y-2.5">
               {[
-                'Individual wallpaper purchases (₹99)',
+                'Individual wallpaper purchases (₹29)',
                 'Wallpaper packs once purchased',
                 'Subscription fees for the current billing period',
                 'Purchases where the file has already been downloaded',
@@ -65,7 +65,7 @@ export default function RefundPolicyPage() {
           <section>
             <h2 className="text-base font-semibold text-[var(--text)] mb-3">2. Individual Wallpaper Purchases</h2>
             <p>
-              Purchases of individual wallpapers (₹99 per wallpaper) are <span className="text-[var(--text)]">
+              Purchases of individual wallpapers (₹29 per wallpaper) are <span className="text-[var(--text)]">
               non-refundable</span>. Once a transaction is completed and the wallpaper is available for download
               in your library, no refund will be issued regardless of whether the file was actually downloaded.
             </p>
@@ -82,7 +82,7 @@ export default function RefundPolicyPage() {
           <section>
             <h2 className="text-base font-semibold text-[var(--text)] mb-3">4. Subscriptions</h2>
             <p className="mb-3">
-              Monthly subscriptions (₹499/month) are billed at the start of each billing cycle.
+              Monthly subscriptions (₹199/month) are billed at the start of each billing cycle.
             </p>
             <ul className="list-disc list-inside space-y-1.5 pl-2">
               <li>Subscription fees for the <span className="text-[var(--text)]">current billing period are non-refundable</span>.</li>

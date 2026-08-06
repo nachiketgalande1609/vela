@@ -53,8 +53,8 @@ export default function TermsOfServicePage() {
               selected payment method.
             </p>
             <ul className="list-disc list-inside space-y-1.5 pl-2">
-              <li><span className="text-[var(--text)]">Individual wallpapers</span> — ₹99 per wallpaper, one-time purchase granting a personal use licence.</li>
-              <li><span className="text-[var(--text)]">Monthly subscription</span> — ₹499 per month, granting unlimited downloads of all wallpapers on the platform for the duration of the active subscription period.</li>
+              <li><span className="text-[var(--text)]">Individual wallpapers</span> — ₹29 per wallpaper, one-time purchase granting a personal use licence.</li>
+              <li><span className="text-[var(--text)]">Monthly subscription</span> — ₹199 per month, granting unlimited downloads of all wallpapers on the platform for the duration of the active subscription period.</li>
               <li>Subscription access ceases at the end of the billing period if not renewed. Previously downloaded files remain on your device but you lose the right to download new ones.</li>
             </ul>
           </section>

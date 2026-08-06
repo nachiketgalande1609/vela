@@ -20,7 +20,7 @@ export default async function AboutPage() {
     { label: 'Wallpapers', value: `${wallpaperCount}+` },
     { label: 'Categories', value: `${categoryCount}` },
     { label: 'Resolution', value: '4K' },
-    { label: 'Price per wall', value: '₹99' },
+    { label: 'Price per wall', value: '₹29' },
   ]
 
   const values = [

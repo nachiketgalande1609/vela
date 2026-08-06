@@ -135,7 +135,7 @@ export default async function AnalyticsPage() {
       icon: CreditCard,
       label: 'Active Subscriptions',
       value: activeSubscriptions,
-      sub: `₹${(activeSubscriptions * 499).toFixed(0)}/mo recurring`,
+      sub: `₹${(activeSubscriptions * 199).toFixed(0)}/mo recurring`,
       growth: null,
       accent: false,
     },

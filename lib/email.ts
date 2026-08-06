@@ -155,7 +155,7 @@ export async function sendSubscriptionConfirmationEmail(
         <tr>
           <td style="padding:16px 20px;">
             <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#555;">Plan</p>
-            <p style="margin:0;font-size:14px;color:#E5E5E5;font-weight:600;">Vela+ Monthly — ₹499 / month</p>
+            <p style="margin:0;font-size:14px;color:#E5E5E5;font-weight:600;">Vela+ Monthly — ₹199 / month</p>
           </td>
         </tr>
         <tr>

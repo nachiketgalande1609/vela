@@ -28,7 +28,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: { default: 'Vela — Premium Mobile Wallpapers', template: `%s | Vela` },
-  description: 'Discover and download premium mobile wallpapers. Buy individual wallpapers for ₹99 or subscribe for unlimited downloads at ₹499/month.',
+  description: 'Discover and download premium mobile wallpapers. Buy individual wallpapers for ₹29 or subscribe for unlimited downloads at ₹199/month.',
   keywords: ['mobile wallpapers', 'premium wallpapers', 'phone wallpapers', 'buy wallpapers india', 'HD wallpapers', 'aesthetic wallpapers', 'dark wallpapers', 'abstract wallpapers'],
   authors: [{ name: 'Nachiket Galande' }],
   creator: 'Nachiket Galande',
@@ -40,12 +40,12 @@ export const metadata: Metadata = {
     url: 'https://vela.nachiketgalande.com',
     siteName: 'Vela',
     title: 'Vela — Premium Mobile Wallpapers',
-    description: 'Discover and download premium mobile wallpapers. Buy individual wallpapers for ₹99 or subscribe for unlimited downloads at ₹499/month.',
+    description: 'Discover and download premium mobile wallpapers. Buy individual wallpapers for ₹29 or subscribe for unlimited downloads at ₹199/month.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Vela — Premium Mobile Wallpapers',
-    description: 'Discover and download premium mobile wallpapers. Buy individual wallpapers for ₹99 or subscribe for unlimited downloads at ₹499/month.',
+    description: 'Discover and download premium mobile wallpapers. Buy individual wallpapers for ₹29 or subscribe for unlimited downloads at ₹199/month.',
     creator: '@nachiketgalande',
   },
   robots: {

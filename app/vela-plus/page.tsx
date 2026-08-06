@@ -51,7 +51,7 @@ export default async function VelaPlusPage() {
         {/* Pricing card */}
         <div className="rounded-[4px] border border-[var(--accent)]/30 bg-[var(--surface)] p-8 mb-6">
           <div className="flex items-baseline gap-2 mb-1">
-            <span className="text-5xl font-bold text-[var(--accent)]" style={{ fontFamily: 'var(--font-playfair)' }}>₹499</span>
+            <span className="text-5xl font-bold text-[var(--accent)]" style={{ fontFamily: 'var(--font-playfair)' }}>₹199</span>
             <span className="text-[var(--text-muted)]">/ month</span>
           </div>
           <p className="text-sm text-[var(--text-muted)] mb-8">

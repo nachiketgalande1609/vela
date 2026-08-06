@@ -120,7 +120,7 @@ export default function LicencePage() {
           <section>
             <h2 className="text-base font-semibold text-[var(--text)] mb-3">5. Subscription Licence</h2>
             <p>
-              Subscribers (₹499/month) receive the same personal use licence for all wallpapers on the platform
+              Subscribers (₹199/month) receive the same personal use licence for all wallpapers on the platform
               for the duration of their active subscription. Upon cancellation or expiry of the subscription,
               the right to download new wallpapers ceases. Wallpapers already downloaded prior to cancellation
               may continue to be used on personal devices under the personal use licence.

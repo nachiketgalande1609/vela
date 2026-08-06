@@ -79,7 +79,7 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
   const wallpaperPackTotal = subInCart ? 0
     : billableItems.reduce((sum, i) => sum + i.wallpaper.price, 0)
       + billablePackItems.reduce((sum, i) => sum + i.pack.price, 0)
-  const subtotal = wallpaperPackTotal + (subInCart ? 499 : 0)
+  const subtotal = wallpaperPackTotal + (subInCart ? 199 : 0)
   const totalCount = billableItems.length + billablePackItems.length + (subInCart ? 1 : 0)
 
   async function handleCheckout() {
@@ -233,7 +233,7 @@ export function CartClient({ items: initialItems, packItems: initialPackItems, h
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-[var(--text)]">Vela+</p>
                 <p className="text-xs text-[var(--text-muted)]">Vela+ · Unlimited wallpapers</p>
-                <p className="mt-1 text-sm font-semibold text-[var(--accent)]">₹499 / month</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--accent)]">₹199 / month</p>
               </div>
               <button
                 onClick={async () => {

@@ -40,7 +40,7 @@ export async function HeroSection({ isAuthenticated, hasSubscription }: Props) {
           </h1>
 
           <p className="text-[var(--text-muted)] text-sm leading-relaxed mb-6 max-w-sm mx-auto lg:mx-0">
-            Curated, AI-generated high-resolution wallpapers built for your phone. Buy individual wallpapers for ₹99 or unlock everything with Vela+.
+            Curated, AI-generated high-resolution wallpapers built for your phone. Buy individual wallpapers for ₹29 or unlock everything with Vela+.
           </p>
 
           {hasSubscription ? (
@@ -53,7 +53,7 @@ export async function HeroSection({ isAuthenticated, hasSubscription }: Props) {
                 <div>
                   <p className="text-[10px] text-[var(--text-muted)] mb-0.5">Unlimited downloads</p>
                   <p className="text-xl font-bold text-[var(--accent)]" style={{ fontFamily: 'var(--font-playfair)' }}>
-                    ₹499<span className="text-xs font-normal text-[var(--text-muted)]"> / month</span>
+                    ₹199<span className="text-xs font-normal text-[var(--text-muted)]"> / month</span>
                   </p>
                 </div>
                 <div className="w-px h-8 bg-[var(--border)]" />

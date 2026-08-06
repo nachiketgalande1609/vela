@@ -157,7 +157,7 @@ export function OrdersClient({ orders, subscription }: Props) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm font-semibold text-[var(--accent)]">₹499 / mo</span>
+            <span className="text-sm font-semibold text-[var(--accent)]">₹199 / mo</span>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
               subscription.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-[var(--surface-2)] text-[var(--text-muted)]'
             }`}>

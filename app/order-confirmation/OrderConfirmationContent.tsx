@@ -47,7 +47,7 @@ export function OrderConfirmationContent() {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-[var(--text-muted)]">Amount</span>
-              <span className="text-[var(--accent)] font-semibold">₹499 / month</span>
+              <span className="text-[var(--accent)] font-semibold">₹199 / month</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-[var(--text-muted)]">Status</span>

@@ -18,7 +18,7 @@ export function CreatePackClient({ wallpapers }: { wallpapers: Wallpaper[] }) {
   const router = useRouter()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [price, setPrice] = useState('250')
+  const [price, setPrice] = useState('79')
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [saving, setSaving] = useState(false)
   const [search, setSearch] = useState('')
@@ -44,7 +44,7 @@ export function CreatePackClient({ wallpapers }: { wallpapers: Wallpaper[] }) {
       const res = await fetch('/api/admin/packs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, price: parseFloat(price) || 250, wallpaperIds: [...selected] }),
+        body: JSON.stringify({ title, description, price: parseFloat(price) || 79, wallpaperIds: [...selected] }),
       })
       const data = await res.json() as { pack?: { id: string }; error?: string }
       if (!res.ok || !data.pack) { toast.error(data.error ?? 'Failed to create pack'); return }
