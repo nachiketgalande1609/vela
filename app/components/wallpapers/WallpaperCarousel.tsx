@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface Props {
@@ -424,17 +424,36 @@ function HomeOverlay() {
 
 export function WallpaperCarousel({ src, alt, canAccess }: Props) {
   const [current, setCurrent] = useState(0)
+  const touchStartX = useRef<number | null>(null)
 
   const prev = () => setCurrent((c) => (c === 0 ? 2 : c - 1))
   const next = () => setCurrent((c) => (c === 2 ? 0 : c + 1))
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return
+    const delta = touchStartX.current - e.changedTouches[0].clientX
+    if (Math.abs(delta) > 40) delta > 0 ? next() : prev()
+    touchStartX.current = null
+  }
+
   const displayWidth = 248
   const carouselHeight = 580
+  // phone is 252px wide; arrows sit 8px outside each edge
+  const arrowOffset = 'calc(50% - 164px)'
+  const arrowOffsetRight = 'calc(50% + 132px)'
 
   return (
     <div className="flex flex-col items-center gap-4 w-full">
       {/* Track */}
-      <div className="relative w-full overflow-hidden" style={{ height: carouselHeight }}>
+      <div
+        className="relative w-full overflow-hidden"
+        style={{ height: carouselHeight }}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <div
           className="flex h-full transition-transform duration-300 ease-out"
           style={{ transform: `translateX(-${current * 100}%)` }}
@@ -478,7 +497,8 @@ export function WallpaperCarousel({ src, alt, canAccess }: Props) {
         <button
           onClick={prev}
           aria-label="Previous"
-          className="absolute left-1 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]/80 text-[var(--text-muted)] backdrop-blur-sm hover:text-[var(--text)] transition-colors"
+          className="absolute top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]/80 text-[var(--text-muted)] backdrop-blur-sm hover:text-[var(--text)] transition-colors"
+          style={{ left: arrowOffset }}
         >
           <ChevronLeft size={16} />
         </button>
@@ -487,7 +507,8 @@ export function WallpaperCarousel({ src, alt, canAccess }: Props) {
         <button
           onClick={next}
           aria-label="Next"
-          className="absolute right-1 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]/80 text-[var(--text-muted)] backdrop-blur-sm hover:text-[var(--text)] transition-colors"
+          className="absolute top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]/80 text-[var(--text-muted)] backdrop-blur-sm hover:text-[var(--text)] transition-colors"
+          style={{ left: arrowOffsetRight }}
         >
           <ChevronRight size={16} />
         </button>
