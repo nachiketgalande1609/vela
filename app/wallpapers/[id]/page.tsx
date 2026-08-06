@@ -7,6 +7,7 @@ import { prisma } from '@/lib/db/prisma'
 import { verifySession } from '@/lib/auth/dal'
 import { PublicNav } from '@/app/components/layout/PublicNav'
 import { PreviewImage } from '@/app/components/wallpapers/PreviewImage'
+import { WallpaperCarousel } from '@/app/components/wallpapers/WallpaperCarousel'
 import { DownloadButton } from '@/app/components/wallpapers/DownloadButton'
 import { SubscribeButton } from '@/app/components/wallpapers/SubscribeButton'
 import { canDownload } from '@/lib/wallpapers/can-download'
@@ -141,26 +142,13 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
 
       <div className="mx-auto max-w-7xl px-3 pt-4 pb-6 sm:px-6 sm:py-8">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-          {/* Preview */}
+          {/* Preview carousel */}
           <div className="flex justify-center">
-            <div className="relative w-full max-w-sm">
-              <PreviewImage
-                src={wallpaper.previewPath}
-                alt={wallpaper.title}
-                width={600}
-                height={1067}
-                className="w-full rounded-[4px] border border-[var(--border)]"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-              />
-              {!canAccess && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-[4px]">
-                  <span className="rounded-[4px] bg-black/60 px-3 py-1.5 text-xs text-[var(--text-muted)] backdrop-blur-sm">
-                    Preview only
-                  </span>
-                </div>
-              )}
-            </div>
+            <WallpaperCarousel
+              src={wallpaper.previewPath}
+              alt={wallpaper.title}
+              canAccess={canAccess}
+            />
           </div>
 
           {/* Details */}

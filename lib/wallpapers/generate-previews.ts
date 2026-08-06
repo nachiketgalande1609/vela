@@ -15,8 +15,10 @@ export async function generatePreviews(
   const previewKey = `previews/preview_${wallpaperId}.jpg`
 
   const [thumbBuffer, previewBuffer] = await Promise.all([
+    // Thumb: fixed 9:16 crop for consistent card grids
     sharp(sourceBuffer).resize(400, 711, { fit: 'cover' }).jpeg({ quality: 75 }).toBuffer(),
-    sharp(sourceBuffer).resize(600, 1067, { fit: 'cover' }).jpeg({ quality: 85 }).toBuffer(),
+    // Preview: full image at natural aspect ratio, max width 900px — no cropping
+    sharp(sourceBuffer).resize({ width: 900, withoutEnlargement: true }).jpeg({ quality: 85 }).toBuffer(),
   ])
 
   await Promise.all([
