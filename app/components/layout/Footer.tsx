@@ -14,12 +14,12 @@ export function Footer() {
         <img src="/icon.svg" alt="Vela" width={18} height={18} />
       </div>
 
-      {/* Links — hidden on mobile until expanded */}
+      {/* Mobile expandable links */}
       <div
-        className="overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out sm:!max-h-20 sm:!opacity-100"
+        className="sm:hidden overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out"
         style={{ maxHeight: expanded ? '80px' : '0px', opacity: expanded ? 1 : 0 }}
       >
-        <div className="flex items-center flex-wrap justify-center gap-x-3 gap-y-0.5 sm:gap-x-5 text-[10px] sm:text-xs text-[var(--text-muted)] py-2">
+        <div className="flex items-center flex-wrap justify-center gap-x-3 gap-y-0.5 text-[10px] text-[var(--text-muted)] py-2">
           <Link href="/about" className="hover:text-[var(--text)] transition-colors">About</Link>
           <Link href="/privacy" className="hover:text-[var(--text)] transition-colors">Privacy</Link>
           <Link href="/terms" className="hover:text-[var(--text)] transition-colors">Terms</Link>
@@ -30,8 +30,20 @@ export function Footer() {
       </div>
 
       {/* Bottom row */}
-      <div className="flex items-center justify-between sm:justify-between py-2.5 text-[10px] sm:text-xs text-[var(--text-muted)]">
+      <div className="flex items-center justify-between py-2.5 text-[10px] sm:text-xs text-[var(--text-muted)]">
         <p>© {new Date().getFullYear()} Vela · AI-generated wallpapers.</p>
+
+        {/* Desktop links — inline */}
+        <div className="hidden sm:flex items-center gap-x-5">
+          <Link href="/about" className="hover:text-[var(--text)] transition-colors">About</Link>
+          <Link href="/privacy" className="hover:text-[var(--text)] transition-colors">Privacy</Link>
+          <Link href="/terms" className="hover:text-[var(--text)] transition-colors">Terms</Link>
+          <Link href="/license" className="hover:text-[var(--text)] transition-colors">Licence</Link>
+          <Link href="/refund-policy" className="hover:text-[var(--text)] transition-colors">Refund</Link>
+          <Link href="/contact" className="hover:text-[var(--text)] transition-colors">Contact</Link>
+        </div>
+
+        {/* Mobile chevron toggle */}
         <button
           onClick={() => setExpanded((e) => !e)}
           aria-label="Toggle footer links"
