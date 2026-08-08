@@ -17,8 +17,8 @@ export async function generatePreviews(
   const [thumbBuffer, previewBuffer] = await Promise.all([
     // Thumb: fixed 9:16 crop for consistent card grids
     sharp(sourceBuffer).resize(400, 711, { fit: 'cover' }).jpeg({ quality: 75 }).toBuffer(),
-    // Preview: full image at natural aspect ratio, max width 900px — no cropping
-    sharp(sourceBuffer).resize({ width: 900, withoutEnlargement: true }).jpeg({ quality: 85 }).toBuffer(),
+    // Preview: full image at natural aspect ratio, max width 600px — no cropping
+    sharp(sourceBuffer).resize({ width: 600, withoutEnlargement: true }).jpeg({ quality: 70 }).toBuffer(),
   ])
 
   await Promise.all([

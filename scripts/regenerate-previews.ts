@@ -2,7 +2,7 @@
  * Regenerates preview and thumb images for every wallpaper in the DB.
  * Run: npm run regen-previews
  *
- * - Preview: full natural aspect ratio, max 900px wide (no cropping)
+ * - Preview: full natural aspect ratio, max 600px wide (no cropping)
  * - Thumb:   fixed 400×711 crop (9:16, used in grid cards)
  */
 import { readFileSync } from 'fs'
@@ -87,7 +87,7 @@ async function main() {
 
       const [thumbBuffer, previewBuffer] = await Promise.all([
         sharp(buffer).resize(400, 711, { fit: 'cover' }).jpeg({ quality: 75 }).toBuffer(),
-        sharp(buffer).resize({ width: 900, withoutEnlargement: true }).jpeg({ quality: 85 }).toBuffer(),
+        sharp(buffer).resize({ width: 600, withoutEnlargement: true }).jpeg({ quality: 70 }).toBuffer(),
       ])
 
       await Promise.all([
