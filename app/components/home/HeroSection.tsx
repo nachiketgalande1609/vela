@@ -24,7 +24,7 @@ export async function HeroSection({ isAuthenticated, hasSubscription }: Props) {
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent)]/6 via-transparent to-transparent pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-transparent to-transparent pointer-events-none z-10" />
 
-      <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 py-10 sm:py-14 flex flex-col lg:flex-row items-center gap-8 lg:gap-6">
+      <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-10 flex flex-col lg:flex-row items-center gap-8 lg:gap-6">
 
         {/* Left — copy */}
         <div className="flex-1 text-center lg:text-left">

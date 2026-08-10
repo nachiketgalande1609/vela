@@ -74,7 +74,7 @@ function PriceDialog({ count, onConfirm, onClose }: { count: number; onConfirm: 
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && price) { onConfirm(parseFloat(price)); onClose() } }}
-            placeholder="99"
+            placeholder="29"
             className="w-full rounded-[4px] border border-[var(--border)] bg-[var(--surface-2)] pl-7 pr-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition-colors"
           />
         </div>
