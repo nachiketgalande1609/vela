@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { WallpaperCard, type WallpaperCardData } from '@/app/components/wallpapers/WallpaperCard'
+import { WallpaperCardSkeleton } from '@/app/components/ui/Skeletons'
 import { Loader2 } from 'lucide-react'
 
 interface WallpaperBrowseProps {
@@ -89,7 +90,7 @@ export function WallpaperBrowse({ isAuthenticated, category }: WallpaperBrowsePr
       {initialLoading ? (
         <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="rounded-[4px] bg-[var(--surface)] animate-pulse" style={{ aspectRatio: '9/16' }} />
+            <WallpaperCardSkeleton key={i} />
           ))}
         </div>
       ) : wallpapers.length === 0 ? (

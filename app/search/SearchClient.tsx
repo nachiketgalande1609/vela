@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Search, X } from 'lucide-react'
 import { Loader2 } from 'lucide-react'
 import { WallpaperCard, WallpaperCardData } from '@/app/components/wallpapers/WallpaperCard'
+import { WallpaperCardSkeleton } from '@/app/components/ui/Skeletons'
 
 interface SearchClientProps {
   initialQuery: string
@@ -130,7 +131,7 @@ export function SearchClient({ initialQuery }: SearchClientProps) {
       {initialLoading && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="aspect-[9/16] rounded-[4px] bg-[var(--surface)] animate-pulse" />
+            <WallpaperCardSkeleton key={i} />
           ))}
         </div>
       )}
