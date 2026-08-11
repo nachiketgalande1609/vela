@@ -417,9 +417,9 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
             <tbody>
               {filteredWallpapers.map((w) => (
                 <Fragment key={w.id}>
-                  <tr className={`border-t border-[var(--border)] transition-colors ${selected.has(w.id) ? 'bg-[var(--accent)]/5' : 'hover:bg-[var(--surface-2)]'}`}>
+                  <tr onClick={() => toggleSelect(w.id)} className={`border-t border-[var(--border)] transition-colors cursor-pointer ${selected.has(w.id) ? 'bg-[var(--accent)]/5' : 'hover:bg-[var(--surface-2)]'}`}>
                     <td className="px-4 py-3">
-                      <div onClick={() => toggleSelect(w.id)} className={`h-4 w-4 cursor-pointer rounded-[3px] border flex items-center justify-center transition-colors ${selected.has(w.id) ? 'bg-[var(--accent)] border-[var(--accent)]' : 'border-[var(--border)] hover:border-[var(--text-muted)]'}`}>
+                      <div className={`h-4 w-4 rounded-[3px] border flex items-center justify-center transition-colors ${selected.has(w.id) ? 'bg-[var(--accent)] border-[var(--accent)]' : 'border-[var(--border)]'}`}>
                         {selected.has(w.id) && <Check className="h-2.5 w-2.5 text-black" />}
                       </div>
                     </td>
@@ -436,7 +436,7 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
                       ) : (
                         <div className="flex flex-wrap gap-1">
                           {w.packs.map((p) => (
-                            <Link key={p.id} href={`/packs/${p.id}`} target="_blank"
+                            <Link key={p.id} href={`/packs/${p.id}`} target="_blank" onClick={(e) => e.stopPropagation()}
                               className="rounded-[3px] border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-1.5 py-0.5 text-[10px] text-[var(--accent)] hover:bg-[var(--accent)]/15 transition-colors whitespace-nowrap">
                               {p.title}
                             </Link>
@@ -454,7 +454,7 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
                         {w.published ? 'Published' : 'Draft'}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-center gap-2">
                         <button onClick={() => void togglePublished(w.id, w.published)}
                           className={`rounded-[4px] px-3 py-1.5 text-[10px] font-medium uppercase tracking-wide border transition-colors ${w.published ? 'border-red-500/30 text-red-400 hover:bg-red-500/10' : 'border-[var(--accent)]/50 text-[var(--accent)] hover:bg-[var(--accent)]/10'}`}>
