@@ -13,6 +13,7 @@ interface WallpaperRow {
   category: string
   published: boolean
   thumbPath: string
+  previewPath: string
   createdAt: string
   packs: { id: string; title: string }[]
 }
@@ -95,6 +96,21 @@ function PriceDialog({ count, onConfirm, onClose }: { count: number; onConfirm: 
   )
 }
 
+function ImagePreviewDialog({ src, title, onClose }: { src: string; title: string; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+      <div className="relative z-10 flex flex-col items-center gap-3" onClick={(e) => e.stopPropagation()}>
+        <div className="relative overflow-hidden rounded-[8px] shadow-2xl border border-white/10" style={{ width: 220, aspectRatio: '9/16' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={src} alt={title} className="w-full h-full object-cover" />
+        </div>
+        <p className="text-sm text-white/70 truncate max-w-[220px]">{title}</p>
+      </div>
+    </div>
+  )
+}
+
 function GenreDialog({ count, onConfirm, onClose }: { count: number; onConfirm: (category: string) => void; onClose: () => void }) {
   const [category, setCategory] = useState(CATEGORIES[0])
 
@@ -172,6 +188,7 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
   const [confirmOpts, setConfirmOpts] = useState<ConfirmOptions | null>(null)
   const [showPriceDialog, setShowPriceDialog] = useState(false)
   const [showGenreDialog, setShowGenreDialog] = useState(false)
+  const [previewImage, setPreviewImage] = useState<{ src: string; title: string } | null>(null)
 
   // bulk action states
   const [bulkDeleting, setBulkDeleting] = useState(false)
@@ -423,9 +440,9 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
                         {selected.has(w.id) && <Check className="h-2.5 w-2.5 text-black" />}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-center">
-                      <div className="relative h-20 w-11 rounded-[2px] overflow-hidden bg-[var(--surface-2)] inline-block">
-                        <Image src={w.thumbPath} alt={w.title} fill className="object-cover" sizes="44px" unoptimized />
+                    <td className="px-4 py-3 text-center" onClick={(e) => { e.stopPropagation(); setPreviewImage({ src: w.previewPath, title: w.title }) }}>
+                      <div className="relative h-28 w-16 rounded-[4px] overflow-hidden bg-[var(--surface-2)] inline-block cursor-zoom-in hover:ring-2 hover:ring-[var(--accent)]/50 transition-all">
+                        <Image src={w.thumbPath} alt={w.title} fill className="object-cover" sizes="64px" unoptimized />
                       </div>
                     </td>
                     <td className="px-4 py-3 text-left font-medium text-[var(--text)] max-w-[200px] truncate">{w.title}</td>
@@ -549,6 +566,13 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
           count={selected.size}
           onConfirm={handleBulkGenre}
           onClose={() => setShowGenreDialog(false)}
+        />
+      )}
+      {previewImage && (
+        <ImagePreviewDialog
+          src={previewImage.src}
+          title={previewImage.title}
+          onClose={() => setPreviewImage(null)}
         />
       )}
     </div>
