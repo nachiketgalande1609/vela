@@ -3,7 +3,7 @@ import { useState, useRef, Fragment, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import { Trash2, Plus, ChevronDown, ChevronUp, Trash, Check, Loader2, IndianRupee, ChevronRight, Search, X } from 'lucide-react'
+import { Trash2, Plus, ChevronDown, ChevronUp, Trash, Check, Loader2, IndianRupee, ChevronRight, Search, X, Tag } from 'lucide-react'
 
 interface WallpaperRow {
   id: string
@@ -95,6 +95,42 @@ function PriceDialog({ count, onConfirm, onClose }: { count: number; onConfirm: 
   )
 }
 
+function GenreDialog({ count, onConfirm, onClose }: { count: number; onConfirm: (category: string) => void; onClose: () => void }) {
+  const [category, setCategory] = useState(CATEGORIES[0])
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative z-10 w-full max-w-sm rounded-[4px] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-2xl">
+        <h3 className="text-base font-semibold text-[var(--text)]" style={{ fontFamily: 'var(--font-playfair)' }}>
+          Edit genre for {count} wallpaper{count > 1 ? 's' : ''}
+        </h3>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">Assign a new genre to all selected wallpapers.</p>
+        <div className="mt-4">
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full rounded-[4px] border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--accent)] transition-colors"
+          >
+            {CATEGORIES.map((c) => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
+          </select>
+        </div>
+        <div className="mt-6 flex justify-end gap-3">
+          <button onClick={onClose}
+            className="rounded-[4px] border border-[var(--border)] px-4 py-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+            Cancel
+          </button>
+          <button
+            onClick={() => { onConfirm(category); onClose() }}
+            className="rounded-[4px] bg-[var(--accent)] px-4 py-2 text-sm font-medium text-black hover:bg-[var(--accent-hover)] transition-colors">
+            Update genre
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export function AdminWallpapersClient({ initial, allPacks }: { initial: WallpaperRow[]; allPacks: PackOption[] }) {
@@ -135,6 +171,7 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
   // dialogs
   const [confirmOpts, setConfirmOpts] = useState<ConfirmOptions | null>(null)
   const [showPriceDialog, setShowPriceDialog] = useState(false)
+  const [showGenreDialog, setShowGenreDialog] = useState(false)
 
   // bulk action states
   const [bulkDeleting, setBulkDeleting] = useState(false)
@@ -171,6 +208,20 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
       setSelected(new Set())
       toast.success(`Price updated for ${ids.length} wallpaper${ids.length > 1 ? 's' : ''}`)
     } else toast.error('Price update failed')
+  }
+
+  const handleBulkGenre = async (category: string) => {
+    const ids = Array.from(selected)
+    const res = await fetch('/api/admin/wallpapers/bulk-update-category', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids, category }),
+    })
+    if (res.ok) {
+      setWallpapers((p) => p.map((w) => ids.includes(w.id) ? { ...w, category } : w))
+      setSelected(new Set())
+      toast.success(`Genre updated for ${ids.length} wallpaper${ids.length > 1 ? 's' : ''}`)
+    } else toast.error('Genre update failed')
   }
 
   const handleBulkDelete = () => {
@@ -275,6 +326,10 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
               <button onClick={() => setShowPriceDialog(true)}
                 className="flex items-center gap-1.5 rounded-[4px] border border-[var(--border)] px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
                 <IndianRupee className="h-3.5 w-3.5" /> Edit price
+              </button>
+              <button onClick={() => setShowGenreDialog(true)}
+                className="flex items-center gap-1.5 rounded-[4px] border border-[var(--border)] px-3 py-2 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+                <Tag className="h-3.5 w-3.5" /> Edit genre
               </button>
               <button onClick={handleBulkDelete} disabled={bulkDeleting}
                 className="flex items-center gap-1.5 rounded-[4px] border border-red-500/30 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/10 disabled:opacity-50 transition-colors">
@@ -485,6 +540,13 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
           count={selected.size}
           onConfirm={handleBulkPrice}
           onClose={() => setShowPriceDialog(false)}
+        />
+      )}
+      {showGenreDialog && (
+        <GenreDialog
+          count={selected.size}
+          onConfirm={handleBulkGenre}
+          onClose={() => setShowGenreDialog(false)}
         />
       )}
     </div>
