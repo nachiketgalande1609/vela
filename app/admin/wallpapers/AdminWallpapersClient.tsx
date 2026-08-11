@@ -298,6 +298,7 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
   return (
     <div className="space-y-6">
 
+      <div className="sticky top-16 z-20 bg-[var(--bg)] pb-2 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
@@ -386,6 +387,7 @@ export function AdminWallpapersClient({ initial, allPacks }: { initial: Wallpape
         <span className="text-xs text-[var(--text-muted)] ml-auto">
           {filteredWallpapers.length} of {wallpapers.length}
         </span>
+      </div>
       </div>
 
       {/* Table */}
