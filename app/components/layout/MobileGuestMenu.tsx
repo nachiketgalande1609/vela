@@ -36,7 +36,7 @@ export function MobileGuestMenu() {
 
       {open && (
         <div
-          className="fixed top-[60px] left-3 right-3 rounded-[4px] border border-[var(--border)] bg-[var(--surface)] py-1 shadow-xl z-50 transition-all duration-200 origin-top"
+          className="fixed top-[68px] left-3 right-3 rounded-[4px] border border-[var(--border)] bg-[var(--surface)] py-1 shadow-xl z-50 transition-all duration-200 origin-top"
           style={{ opacity: visible ? 1 : 0, transform: visible ? 'scaleY(1) translateY(0)' : 'scaleY(0.95) translateY(-6px)' }}
         >
           <Link

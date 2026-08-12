@@ -57,7 +57,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <form action={action} className="space-y-5">
+    <form action={action} className="space-y-3 sm:space-y-5">
       <div className="space-y-1.5">
         <label htmlFor="password" className="block text-sm font-medium text-[var(--text-muted)]">
           New password

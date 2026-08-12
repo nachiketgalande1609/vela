@@ -53,7 +53,7 @@ export function GenreDropdown() {
 
       {open && (
         <div
-          className="fixed top-[80px] left-3 right-3 sm:absolute sm:top-full sm:left-0 sm:right-auto sm:mt-2 sm:w-48 z-50 rounded-[4px] border border-[var(--border)] bg-[var(--surface)] shadow-xl overflow-hidden flex flex-col max-h-[60vh] transition-all duration-200 origin-top"
+          className="fixed top-[68px] left-3 right-3 sm:absolute sm:top-full sm:left-0 sm:right-auto sm:mt-2 sm:w-48 z-50 rounded-[4px] border border-[var(--border)] bg-[var(--surface)] shadow-xl overflow-hidden flex flex-col max-h-[60vh] transition-all duration-200 origin-top"
           style={{ opacity: visible ? 1 : 0, transform: visible ? 'scaleY(1) translateY(0)' : 'scaleY(0.95) translateY(-6px)' }}
         >
           {hasAbove && (

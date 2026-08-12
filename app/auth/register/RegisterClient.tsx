@@ -66,8 +66,8 @@ export default function RegisterPage() {
 
   return (
     <AuthCard title="Create account" subtitle="Join Vela and start your collection.">
-      <form action={action} className="space-y-5">
-        <div className="space-y-1.5">
+      <form action={action} className="space-y-3 sm:space-y-5">
+        <div className="space-y-1">
           <label htmlFor="name" className="block text-sm font-medium text-[var(--text-muted)]">
             Full name
           </label>
@@ -77,7 +77,7 @@ export default function RegisterPage() {
           {state?.errors?.name && <p className="mt-1 text-xs text-red-400">{state.errors.name[0]}</p>}
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <label htmlFor="email" className="block text-sm font-medium text-[var(--text-muted)]">
             Email
           </label>
@@ -87,7 +87,7 @@ export default function RegisterPage() {
           {state?.errors?.email && <p className="mt-1 text-xs text-red-400">{state.errors.email[0]}</p>}
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <label htmlFor="password" className="block text-sm font-medium text-[var(--text-muted)]">
             Password
           </label>
@@ -108,7 +108,7 @@ export default function RegisterPage() {
           )}
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <label htmlFor="confirmPassword" className="block text-sm font-medium text-[var(--text-muted)]">
             Confirm password
           </label>

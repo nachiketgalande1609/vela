@@ -47,7 +47,7 @@ export default function LoginPage() {
 
   return (
     <AuthCard title="Sign in" subtitle="Welcome back — good to see you again.">
-      <form action={action} className="space-y-5">
+      <form action={action} className="space-y-3 sm:space-y-5">
         <div className="space-y-1.5">
           <label htmlFor="email" className="block text-sm font-medium text-[var(--text-muted)]">
             Email
