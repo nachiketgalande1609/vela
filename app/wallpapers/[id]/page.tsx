@@ -157,7 +157,7 @@ export default async function WallpaperDetailPage({ params }: PageProps) {
               <span className="inline-block rounded-[4px] bg-[var(--surface-2)] border border-[var(--border)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)] mb-3">
                 {wallpaper.category}
               </span>
-              <h1 className="text-3xl font-bold text-[var(--text)]" style={{ fontFamily: 'var(--font-playfair)' }}>
+              <h1 className="text-xl font-bold text-[var(--text)]" style={{ fontFamily: 'var(--font-playfair)' }}>
                 {wallpaper.title}
               </h1>
               {wallpaper.description && (

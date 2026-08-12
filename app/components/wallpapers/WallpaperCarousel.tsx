@@ -21,15 +21,15 @@ function PhoneShell({ src, alt, children }: { src: string; alt: string; children
     <div
       className="relative mx-auto flex-shrink-0"
       style={{
-        width: 252,
+        width: 268,
         borderRadius: 46,
         background: 'linear-gradient(160deg, #2a2a2a 0%, #0c0c0c 100%)',
-        padding: 4,
+        padding: 3,
         boxShadow:
           '0 0 0 0.5px #404040, 0 0 0 1.5px #1a1a1a, inset 0 0 0 0.5px #3a3a3a, 0 40px 100px rgba(0,0,0,0.85), 0 8px 24px rgba(0,0,0,0.5)',
       }}
     >
-      {/* Dynamic Island — iPhone 17: narrower pill */}
+      {/* Dynamic Island */}
       <div
         style={{
           position: 'absolute',
@@ -37,20 +37,20 @@ function PhoneShell({ src, alt, children }: { src: string; alt: string; children
           top: 12,
           left: '50%',
           transform: 'translateX(-50%)',
-          width: 62,
+          width: 66,
           height: 19,
           borderRadius: 10,
           background: '#000',
         }}
       />
       {/* Action button */}
-      <div style={{ position: 'absolute', top: 96, left: -2.5, width: 2.5, height: 16, borderRadius: 1.5, background: '#252525' }} />
+      <div style={{ position: 'absolute', top: 102, left: -2.5, width: 2.5, height: 16, borderRadius: 1.5, background: '#252525' }} />
       {/* Volume up */}
-      <div style={{ position: 'absolute', top: 124, left: -2.5, width: 2.5, height: 32, borderRadius: 1.5, background: '#252525' }} />
+      <div style={{ position: 'absolute', top: 132, left: -2.5, width: 2.5, height: 32, borderRadius: 1.5, background: '#252525' }} />
       {/* Volume down */}
-      <div style={{ position: 'absolute', top: 164, left: -2.5, width: 2.5, height: 32, borderRadius: 1.5, background: '#252525' }} />
+      <div style={{ position: 'absolute', top: 174, left: -2.5, width: 2.5, height: 32, borderRadius: 1.5, background: '#252525' }} />
       {/* Power / side */}
-      <div style={{ position: 'absolute', top: 136, right: -2.5, width: 2.5, height: 50, borderRadius: 1.5, background: '#252525' }} />
+      <div style={{ position: 'absolute', top: 145, right: -2.5, width: 2.5, height: 50, borderRadius: 1.5, background: '#252525' }} />
 
       {/* Screen */}
       <div
@@ -341,7 +341,7 @@ function HomeOverlay() {
           color: 'white',
           fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
           marginBottom: 12,
-          padding: '0 10px',
+          padding: '2px 10px 0 30px',
         }}
       >
         <span>9:41</span>
@@ -424,6 +424,7 @@ function HomeOverlay() {
 
 export function WallpaperCarousel({ src, alt, canAccess }: Props) {
   const [current, setCurrent] = useState(0)
+  const [imageLoaded, setImageLoaded] = useState(false)
   const touchStartX = useRef<number | null>(null)
 
   const prev = () => setCurrent((c) => (c === 0 ? 2 : c - 1))
@@ -439,11 +440,8 @@ export function WallpaperCarousel({ src, alt, canAccess }: Props) {
     touchStartX.current = null
   }
 
-  const displayWidth = 248
+  const displayWidth = 300
   const carouselHeight = 580
-  // phone is 252px wide; arrows sit 8px outside each edge
-  const arrowOffset = 'calc(50% - 164px)'
-  const arrowOffsetRight = 'calc(50% + 132px)'
 
   return (
     <div className="flex flex-col items-center gap-4 w-full">
@@ -460,16 +458,19 @@ export function WallpaperCarousel({ src, alt, canAccess }: Props) {
         >
           {/* Slide 1 — plain wallpaper at natural aspect ratio */}
           <div className="min-w-full h-full flex items-center justify-center">
-            <div className="relative px-6 sm:px-0 w-full sm:w-auto">
+            <div className="relative rounded-[4px] overflow-hidden border border-[var(--border)]" style={{ width: displayWidth, aspectRatio: '9/16' }}>
+              {!imageLoaded && (
+                <div className="absolute inset-0 bg-[var(--surface)] animate-pulse" />
+              )}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={src}
                 alt={alt}
-                style={{ display: 'block', maxWidth: displayWidth, height: 'auto' }}
-                className="rounded-[4px] border border-[var(--border)] w-full sm:w-auto"
+                onLoad={() => setImageLoaded(true)}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: imageLoaded ? 1 : 0, transition: 'opacity 0.3s' }}
               />
               {!canAccess && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-[4px]">
+                <div className="absolute inset-0 flex items-center justify-center">
                   <span className="rounded-[4px] bg-black/60 px-3 py-1.5 text-xs text-[var(--text-muted)] backdrop-blur-sm">
                     Preview only
                   </span>
@@ -497,8 +498,7 @@ export function WallpaperCarousel({ src, alt, canAccess }: Props) {
         <button
           onClick={prev}
           aria-label="Previous"
-          className="absolute top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]/80 text-[var(--text-muted)] backdrop-blur-sm hover:text-[var(--text)] transition-colors"
-          style={{ left: arrowOffset }}
+          className="absolute left-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]/80 text-[var(--text-muted)] backdrop-blur-sm hover:text-[var(--text)] transition-colors"
         >
           <ChevronLeft size={16} />
         </button>
@@ -507,8 +507,7 @@ export function WallpaperCarousel({ src, alt, canAccess }: Props) {
         <button
           onClick={next}
           aria-label="Next"
-          className="absolute top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]/80 text-[var(--text-muted)] backdrop-blur-sm hover:text-[var(--text)] transition-colors"
-          style={{ left: arrowOffsetRight }}
+          className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]/80 text-[var(--text-muted)] backdrop-blur-sm hover:text-[var(--text)] transition-colors"
         >
           <ChevronRight size={16} />
         </button>
