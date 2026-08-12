@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, CreditCard, LogOut, LayoutDashboard, ShieldCheck, Package, Heart, BarChart2, Receipt } from 'lucide-react'
+import { ChevronDown, CreditCard, LogOut, LayoutDashboard, ShieldCheck, Package, Heart, BarChart2, Receipt, ShoppingCart } from 'lucide-react'
 import { getCsrfCookie } from '@/app/components/providers/CsrfProvider'
 
 interface Props {
@@ -66,6 +66,13 @@ export function NavDropdown({ name, role }: Props) {
           className="fixed top-[80px] left-3 right-3 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2 sm:w-48 rounded-[4px] border border-[var(--border)] bg-[var(--surface)] py-1 shadow-xl z-50 transition-all duration-200 origin-top"
           style={{ opacity: visible ? 1 : 0, transform: visible ? 'scaleY(1) translateY(0)' : 'scaleY(0.95) translateY(-6px)' }}
         >
+          {/* Cart — visible only on mobile since CartIcon is hidden there */}
+          <Link href="/cart" onClick={() => closeDropdown()} className="sm:hidden flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] transition-colors">
+            <ShoppingCart className="h-4 w-4" />
+            Cart
+          </Link>
+          <div className="sm:hidden my-1 border-t border-[var(--border)]" />
+
           {role === 'ADMIN' ? (
             <>
               <Link href="/admin" onClick={() => closeDropdown()} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] transition-colors">

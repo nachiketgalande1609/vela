@@ -7,6 +7,7 @@ import { GenreDropdown } from './GenreDropdown'
 import { NavSpacer } from './NavSpacer'
 import { CartIcon } from './CartIcon'
 import { NavSearch } from './NavSearch'
+import { MobileGuestMenu } from './MobileGuestMenu'
 
 export async function PublicNav() {
   const session = await verifySession()
@@ -44,14 +45,22 @@ export async function PublicNav() {
             <Link href="/search" aria-label="Search" className="lg:hidden text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
               <Search className="h-6 w-6 sm:h-5 sm:w-5" />
             </Link>
-            <CartIcon />
+            {/* Cart — hidden on mobile, accessible via dropdown menus instead */}
+            <span className="hidden sm:inline-flex">
+              <CartIcon />
+            </span>
             {user ? (
               <NavDropdown name={user.name ?? user.email} role={user.role as 'ADMIN' | 'USER'} />
             ) : (
-              <Link href="/auth/login" className="flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-                <LogIn className="h-6 w-6 sm:h-5 sm:w-5" />
-                <span className="hidden sm:inline">Sign In</span>
-              </Link>
+              <>
+                {/* Desktop sign-in link */}
+                <Link href="/auth/login" className="hidden sm:flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+                  <LogIn className="h-5 w-5" />
+                  <span>Sign In</span>
+                </Link>
+                {/* Mobile hamburger → Cart + Sign In */}
+                <MobileGuestMenu />
+              </>
             )}
           </div>
         </div>
