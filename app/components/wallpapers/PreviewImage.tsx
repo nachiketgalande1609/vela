@@ -24,7 +24,6 @@ export function PreviewImage({ src, alt, width, height, className, sizes, priori
         onContextMenu={(e) => e.preventDefault()}
         className="wallpaper-preview object-cover"
         style={{ pointerEvents: 'none', userSelect: 'none', WebkitUserSelect: 'none' }}
-        unoptimized
       />
     </div>
   )

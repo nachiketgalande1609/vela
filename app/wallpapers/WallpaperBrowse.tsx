@@ -7,6 +7,8 @@ import { Loader2 } from 'lucide-react'
 interface WallpaperBrowseProps {
   isAuthenticated: boolean
   category?: string
+  initialWallpapers?: WallpaperCardData[]
+  initialPages?: number
 }
 
 interface AccessData {
@@ -14,16 +16,18 @@ interface AccessData {
   ownedIds: string[]
 }
 
-export function WallpaperBrowse({ isAuthenticated, category }: WallpaperBrowseProps) {
-  const [wallpapers, setWallpapers] = useState<WallpaperCardData[]>([])
+export function WallpaperBrowse({ isAuthenticated, category, initialWallpapers, initialPages }: WallpaperBrowseProps) {
+  const [wallpapers, setWallpapers] = useState<WallpaperCardData[]>(initialWallpapers ?? [])
   const [loadingMore, setLoadingMore] = useState(false)
-  const [initialLoading, setInitialLoading] = useState(true)
+  const [initialLoading, setInitialLoading] = useState(!initialWallpapers?.length)
   const [access, setAccess] = useState<AccessData>({ hasSubscription: false, ownedIds: [] })
 
   const sentinelRef = useRef<HTMLDivElement>(null)
   const pageRef = useRef(1)
-  const hasMoreRef = useRef(true)
+  const hasMoreRef = useRef((initialPages ?? 0) > 1)
   const fetchingRef = useRef(false)
+  // Track whether the server-provided first page has been consumed
+  const usedInitialRef = useRef(!!initialWallpapers?.length)
 
   const fetchPage = useCallback(async (pg: number) => {
     const qs = category
@@ -38,16 +42,24 @@ export function WallpaperBrowse({ isAuthenticated, category }: WallpaperBrowsePr
     return true
   }, [category])
 
-  // Initial load
+  // Initial load — skipped on first mount when server data is available
   useEffect(() => {
     pageRef.current = 1
+
+    if (usedInitialRef.current) {
+      // Consumed the server-provided first page; just wire up hasMore
+      usedInitialRef.current = false
+      hasMoreRef.current = (initialPages ?? 0) > 1
+      return
+    }
+
     hasMoreRef.current = true
     setWallpapers([])
     setInitialLoading(true)
     fetchPage(1).finally(() => setInitialLoading(false))
-  }, [fetchPage])
+  }, [fetchPage, initialPages])
 
-  // Intersection observer — stable, uses refs not state
+  // Infinite scroll sentinel
   useEffect(() => {
     const el = sentinelRef.current
     if (!el) return
@@ -74,7 +86,7 @@ export function WallpaperBrowse({ isAuthenticated, category }: WallpaperBrowsePr
     return () => observer.disconnect()
   }, [fetchPage])
 
-  // Access data
+  // Access data (subscription + owned wallpapers)
   useEffect(() => {
     if (!isAuthenticated) return
     fetch('/api/user/access')

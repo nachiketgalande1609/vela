@@ -169,7 +169,7 @@ export function TrendingCarousel({ wallpapers }: Props) {
                     <Link href={`/wallpapers/${w.id}`} className="group block w-full h-full">
                       <div className="relative w-full h-full rounded-[14px] overflow-hidden border border-[var(--accent)]/40 shadow-2xl shadow-[var(--accent)]/10">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={w.thumbPath} alt={w.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" draggable={false} />
+                        <img src={w.thumbPath} alt={w.title} loading="eager" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" draggable={false} />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                         <div className="absolute top-3 left-3 flex items-center gap-1 bg-[var(--accent)] rounded-full px-2 py-0.5">
                           <Flame className="h-2.5 w-2.5 text-black" />
@@ -183,7 +183,7 @@ export function TrendingCarousel({ wallpapers }: Props) {
                   ) : (
                     <div className="w-full h-full rounded-[12px] overflow-hidden border border-[var(--border)]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={w.thumbPath} alt="" className="w-full h-full object-cover" draggable={false} />
+                      <img src={w.thumbPath} alt="" loading="lazy" className="w-full h-full object-cover" draggable={false} />
                     </div>
                   )}
                 </div>
