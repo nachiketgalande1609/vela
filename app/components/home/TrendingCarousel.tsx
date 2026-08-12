@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Flame } from 'lucide-react'
 
@@ -19,46 +19,64 @@ interface Props {
 
 const CARD_W = 220
 const GAP = 12
-const STEP = CARD_W + GAP // 232px per step
+const STEP = CARD_W + GAP   // 232px per card slot
 const SWIPE_THRESHOLD = 50
+const TRANSITION_MS = 450
 
 export function TrendingCarousel({ wallpapers }: Props) {
-  const [current, setCurrent] = useState(0)
+  const N = wallpapers.length
+  // Triple the array so we always have cards to slide into on both sides
+  const tripled = useMemo(() => [...wallpapers, ...wallpapers, ...wallpapers], [wallpapers])
+
+  // virtualIdx lives in [N, 2N-1]. After each move we silently snap back if we drift out.
+  const [virtualIdx, setVirtualIdx] = useState(N)
   const [paused, setPaused] = useState(false)
   const [resetKey, setResetKey] = useState(0)
   const [animated, setAnimated] = useState(true)
   const [dragOffset, setDragOffset] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
-  const prevRef = useRef(0)
+
+  const vidxRef = useRef(N)           // mirrors virtualIdx, readable synchronously
   const touchStartXRef = useRef<number | null>(null)
   const dragOffsetRef = useRef(0)
 
-  const goTo = useCallback((idx: number) => {
-    const prev = prevRef.current
-    const n = wallpapers.length
-    const isWrap = (prev === n - 1 && idx === 0) || (prev === 0 && idx === n - 1)
-    prevRef.current = idx
-    setResetKey((k) => k + 1)
-
-    if (isWrap) {
-      setAnimated(false)
-      requestAnimationFrame(() => {
-        setCurrent(idx)
+  // After the slide animation finishes, silently reset virtualIdx to the middle zone
+  const scheduleNormalize = useCallback(() => {
+    setTimeout(() => {
+      setVirtualIdx(v => {
+        const normalized = ((v - N) % N + N) % N + N
+        if (v === normalized) return v
+        setAnimated(false)
+        vidxRef.current = normalized
         requestAnimationFrame(() => setAnimated(true))
+        return normalized
       })
-    } else {
-      setCurrent(idx)
-    }
-  }, [wallpapers.length])
+    }, TRANSITION_MS + 60)
+  }, [N])
 
-  const next = useCallback(() => goTo((prevRef.current + 1) % wallpapers.length), [wallpapers.length, goTo])
-  const prev = useCallback(() => goTo((prevRef.current - 1 + wallpapers.length) % wallpapers.length), [wallpapers.length, goTo])
+  const navigate = useCallback((delta: number) => {
+    vidxRef.current += delta
+    setVirtualIdx(vidxRef.current)
+    setResetKey(k => k + 1)
+    scheduleNormalize()
+  }, [scheduleNormalize])
+
+  const next = useCallback(() => navigate(1), [navigate])
+  const prev = useCallback(() => navigate(-1), [navigate])
+
+  // Jump to a specific real card taking the shortest path
+  const goToReal = useCallback((realIdx: number) => {
+    const currentReal = ((vidxRef.current % N) + N) % N
+    let delta = ((realIdx - currentReal) % N + N) % N
+    if (delta > N / 2) delta -= N
+    if (delta !== 0) navigate(delta)
+  }, [N, navigate])
 
   useEffect(() => {
-    if (paused || wallpapers.length < 2) return
-    const t = setInterval(() => goTo((prevRef.current + 1) % wallpapers.length), 2500)
+    if (paused || N < 2) return
+    const t = setInterval(() => navigate(1), 2500)
     return () => clearInterval(t)
-  }, [paused, wallpapers.length, resetKey, goTo])
+  }, [paused, N, resetKey, navigate])
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartXRef.current = e.touches[0].clientX
@@ -79,26 +97,21 @@ export function TrendingCarousel({ wallpapers }: Props) {
     const delta = dragOffsetRef.current
     touchStartXRef.current = null
     dragOffsetRef.current = 0
-
-    // Reset drag and re-enable transition in same batch so CSS picks up from drag position
+    // Reset in the same batch so CSS transition picks up from the finger position
     setIsDragging(false)
     setDragOffset(0)
     setPaused(false)
-
-    if (delta < -SWIPE_THRESHOLD) {
-      next()
-    } else if (delta > SWIPE_THRESHOLD) {
-      prev()
-    }
-    // If no threshold met, dragOffset snaps back to 0 with transition (rubber-band snap)
+    if (delta < -SWIPE_THRESHOLD) next()
+    else if (delta > SWIPE_THRESHOLD) prev()
   }, [next, prev])
 
-  if (!wallpapers.length) return null
+  if (!N) return null
 
+  const activeReal = ((virtualIdx % N) + N) % N
   const trackTransition = isDragging
     ? 'none'
     : animated
-      ? 'transform 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+      ? `transform ${TRANSITION_MS}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`
       : 'none'
 
   return (
@@ -125,7 +138,7 @@ export function TrendingCarousel({ wallpapers }: Props) {
           </div>
         </div>
 
-        {/* Sliding track */}
+        {/* Sliding track — all 3× cards in a row, track translates to keep active card centred */}
         <div
           className="overflow-hidden touch-pan-y"
           onTouchStart={handleTouchStart}
@@ -136,22 +149,21 @@ export function TrendingCarousel({ wallpapers }: Props) {
           <div
             className="flex items-end gap-3"
             style={{
-              transform: `translateX(calc(50% - ${CARD_W / 2}px - ${current * STEP}px + ${dragOffset}px))`,
+              transform: `translateX(calc(50% - ${CARD_W / 2}px - ${virtualIdx * STEP}px + ${dragOffset}px))`,
               transition: trackTransition,
             }}
           >
-            {wallpapers.map((w, i) => {
-              const dist = Math.abs(i - current)
-              const circDist = Math.min(dist, wallpapers.length - dist)
-              const isCenter = circDist === 0
-              const opacity = isCenter ? 1 : circDist === 1 ? 0.4 : 0.2
+            {tripled.map((w, i) => {
+              const dist = Math.abs(i - virtualIdx)
+              const isCenter = dist === 0
+              const opacity = isCenter ? 1 : dist === 1 ? 0.4 : dist === 2 ? 0.2 : 0
 
               return (
                 <div
-                  key={w.id}
-                  style={{ width: CARD_W, aspectRatio: '9/16', flexShrink: 0, opacity, transition: 'opacity 450ms' }}
-                  onClick={!isCenter ? (i < current ? prev : next) : undefined}
-                  className={!isCenter ? 'cursor-pointer' : ''}
+                  key={i}
+                  style={{ width: CARD_W, aspectRatio: '9/16', flexShrink: 0, opacity, transition: 'opacity 450ms', pointerEvents: opacity === 0 ? 'none' : undefined }}
+                  onClick={!isCenter ? (i < virtualIdx ? prev : next) : undefined}
+                  className={!isCenter && opacity > 0 ? 'cursor-pointer' : ''}
                 >
                   {isCenter ? (
                     <Link href={`/wallpapers/${w.id}`} className="group block w-full h-full">
@@ -161,7 +173,7 @@ export function TrendingCarousel({ wallpapers }: Props) {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                         <div className="absolute top-3 left-3 flex items-center gap-1 bg-[var(--accent)] rounded-full px-2 py-0.5">
                           <Flame className="h-2.5 w-2.5 text-black" />
-                          <span className="text-[9px] font-bold text-black">#{i + 1}</span>
+                          <span className="text-[9px] font-bold text-black">#{activeReal + 1}</span>
                         </div>
                         <div className="absolute bottom-4 left-4 right-4">
                           <p className="text-[var(--accent)] text-xs font-bold">{w.isFree ? 'Free' : `₹${w.price.toFixed(0)}`}</p>
@@ -180,14 +192,14 @@ export function TrendingCarousel({ wallpapers }: Props) {
           </div>
         </div>
 
-        {/* Dot indicators */}
+        {/* Dot indicators keyed to real index */}
         <div className="flex items-center justify-center gap-1.5 mt-5">
           {wallpapers.map((_, i) => (
             <button
               key={i}
-              onClick={() => goTo(i)}
+              onClick={() => goToReal(i)}
               className="transition-all duration-300 rounded-full bg-white"
-              style={{ width: i === current ? 20 : 6, height: 6, opacity: i === current ? 1 : 0.25 }}
+              style={{ width: i === activeReal ? 20 : 6, height: 6, opacity: i === activeReal ? 1 : 0.25 }}
             />
           ))}
         </div>
