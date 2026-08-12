@@ -28,15 +28,18 @@ export async function GET(
     return new Response('Token mismatch', { status: 401 })
   }
 
-  await prisma.downloadNonce.update({
-    where: { nonce: payload.nonce },
-    data: { usedAt: new Date() },
-  })
+  // Mark nonce used and fetch wallpaper metadata in parallel
+  const [, wallpaper] = await Promise.all([
+    prisma.downloadNonce.update({
+      where: { nonce: payload.nonce },
+      data: { usedAt: new Date() },
+    }),
+    prisma.wallpaper.findUnique({
+      where: { id },
+      select: { storagePath: true, title: true },
+    }),
+  ])
 
-  const wallpaper = await prisma.wallpaper.findUnique({
-    where: { id },
-    select: { storagePath: true, title: true },
-  })
   if (!wallpaper) {
     return new Response('Wallpaper not found', { status: 404 })
   }
