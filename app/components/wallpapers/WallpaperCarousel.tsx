@@ -460,13 +460,13 @@ export function WallpaperCarousel({ src, alt, canAccess }: Props) {
         >
           {/* Slide 1 — plain wallpaper at natural aspect ratio */}
           <div className="min-w-full h-full flex items-center justify-center">
-            <div className="relative inline-block">
+            <div className="relative px-6 sm:px-0 w-full sm:w-auto">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={src}
                 alt={alt}
-                style={{ display: 'block', width: displayWidth, height: 'auto' }}
-                className="rounded-[4px] border border-[var(--border)]"
+                style={{ display: 'block', maxWidth: displayWidth, height: 'auto' }}
+                className="rounded-[4px] border border-[var(--border)] w-full sm:w-auto"
               />
               {!canAccess && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-[4px]">
